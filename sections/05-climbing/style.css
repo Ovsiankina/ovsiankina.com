@@ -1,0 +1,16 @@
+.s-climbing {
+  /* --climb-paper, --climb-ink and --climb-tail are set from config by section.js */
+  --replay-fg: #7A6F88;              /* the shared replay button (core/replay.js), on the cream wall */
+  --replay-hover: var(--climb-ink);
+  overflow: hidden;
+  background: var(--climb-paper);
+}
+.s-climbing .stage { position: relative; height: 100vh; height: 100dvh; overflow: hidden; background: var(--climb-paper); }
+.s-climbing canvas { position: absolute; left: 0; top: 0; }
+.s-climbing .holds, .s-climbing .title { image-rendering: pixelated; }
+.s-climbing .replay-btn { transition: opacity 400ms ease; }
+.s-climbing .replay-btn.held { opacity: 0; visibility: hidden; }
+.s-climbing .video { position: absolute; left: 0; top: 0; width: 2px; height: 2px; opacity: 0; pointer-events: none; }
+/* below the scene: cream glitching out into the page's dark background (tail.js) */
+.s-climbing .tail { position: relative; height: var(--climb-tail); overflow: hidden; }
+.s-climbing .tail canvas { image-rendering: pixelated; }

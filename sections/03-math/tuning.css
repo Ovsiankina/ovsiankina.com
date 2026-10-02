@@ -1,0 +1,19 @@
+/* Tuning panel, TEST ONLY: loaded by tuning.js, itself loaded only when config.tuningPanel is true. */
+.s-math .dev {
+  position: absolute; z-index: 5; right: 16px; top: 16px; width: 250px; max-width: calc(100% - 32px);
+  background: var(--bg); border: 1px solid var(--dim); font-size: 11px;
+}
+.s-math .dev summary { list-style: none; cursor: pointer; padding: 9px 12px; display: flex; justify-content: space-between;
+  font: 9px/1 var(--pixel); letter-spacing: .12em; color: var(--dim); }
+.s-math .dev summary::-webkit-details-marker { display: none; }
+.s-math .dev summary::after { content: "+"; }
+.s-math .dev[open] summary::after { content: "-"; }
+.s-math .dev summary:focus-visible { outline: 1px dashed var(--geo); outline-offset: -3px; }
+.s-math .dev .rows { display: grid; gap: 10px; padding: 2px 12px 12px; }
+.s-math .dev label { display: flex; justify-content: space-between; font: 9px/1.4 var(--pixel); letter-spacing: .06em; color: var(--text); }
+.s-math .dev output { font-family: var(--mono); color: var(--ink); font-variant-numeric: tabular-nums; }
+.s-math .dev input[type="range"] { width: 100%; margin: 4px 0 0; accent-color: var(--ink); }
+.s-math .dev .acts { display: flex; gap: 8px; }
+.s-math .dev button { flex: 1; font: 9px/1 var(--pixel); letter-spacing: .1em; color: var(--text); background: none; border: 1px solid var(--dim); padding: 7px 6px; cursor: pointer; }
+.s-math .dev button:hover, .s-math .dev button:focus-visible { color: var(--ink); border-color: var(--ink); outline: none; }
+.s-math .dev .read { font-family: var(--mono); color: var(--dim); font-variant-numeric: tabular-nums; }

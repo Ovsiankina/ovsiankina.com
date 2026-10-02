@@ -1,0 +1,226 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Midnight Swirl</title>
+<style>
+  /* Layout: one full-bleed WebGL canvas with a small control panel. Single dark look by choice. */
+  :root {
+    --night: #03061a;
+    --panel: rgba(3, 6, 26, 0.62);
+    --ink: #e9eefc;
+    --dim: #8f9ac4;
+    --line: rgba(233, 238, 252, 0.18);
+    color-scheme: dark;
+  }
+  html, body { height: 100%; margin: 0; background: var(--night); overflow: hidden; }
+  :root { padding: 0; }
+  canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; cursor: pointer; }
+
+  .ctl {
+    position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    display: grid; grid-template-columns: auto 1fr 3ch; align-items: center; gap: 8px 10px;
+    padding: 10px 12px; border-radius: 8px; max-width: calc(100vw - 32px); box-sizing: border-box;
+    background: var(--panel); color: var(--ink);
+    font: 12px/1 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    letter-spacing: 0.04em; backdrop-filter: blur(6px);
+  }
+  .ctl label { display: flex; align-items: center; gap: 6px; }
+  .sw { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+  .ctl input[type=range] { width: 150px; min-width: 0; }
+  .ctl output { text-align: right; font-variant-numeric: tabular-nums; color: var(--dim); }
+  .seg { grid-column: 1 / -1; display: flex; gap: 6px; }
+  .seg button {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 6px 8px; border-radius: 5px; border: 1px solid var(--line);
+    background: transparent; color: var(--dim); font: inherit; letter-spacing: inherit; cursor: pointer;
+  }
+  .seg button[aria-pressed="true"] { color: var(--ink); border-color: var(--ink); }
+  .seg button:focus-visible, .ctl input:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+</style>
+
+<canvas id="c"></canvas>
+
+<div class="ctl">
+  <label for="amtCream"><span class="sw" style="background:#fff9c2"></span>CREAM</label>
+  <input id="amtCream" type="range" min="0" max="100" value="10" style="accent-color:#fff9c2">
+  <output id="valCream">10</output>
+
+  <label for="amtCyan"><span class="sw" style="background:#2efff2"></span>CYAN</label>
+  <input id="amtCyan" type="range" min="0" max="100" value="80" style="accent-color:#2efff2">
+  <output id="valCyan">80</output>
+
+  <label for="amtThird"><span class="sw" id="thirdSw" style="background:#ff3ff0"></span><span id="thirdName">PINK</span></label>
+  <input id="amtThird" type="range" min="0" max="100" value="20" style="accent-color:#ff3ff0">
+  <output id="valThird">20</output>
+
+  <div class="seg" role="group" aria-label="Third color">
+    <button id="btnPurple" type="button" aria-pressed="false"><span class="sw" style="background:#c46cff"></span>PURPLE</button>
+    <button id="btnPink" type="button" aria-pressed="true"><span class="sw" style="background:#ff3ff0"></span>PINK</button>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('c');
+const gl = canvas.getContext('webgl', { antialias: false });
+
+const vert = `
+attribute vec2 p;
+void main(){ gl_Position = vec4(p, 0.0, 1.0); }`;
+
+const frag = `
+precision highp float;
+uniform vec2  uRes;
+uniform float uTime;
+uniform vec3  uAmt;    // cream, cyan, third (0..1)
+uniform vec3  uThird;  // pink or purple
+
+const vec3 NIGHT = vec3(0.012, 0.024, 0.102);
+const vec3 DEEP  = vec3(0.027, 0.055, 0.220);
+const vec3 BLUE  = vec3(0.090, 0.200, 0.700);
+const vec3 CREAM = vec3(1.000, 0.975, 0.760);  // bright cream #fff9c2
+const vec3 CYAN  = vec3(0.180, 1.000, 0.950);  // neon cyan #2efff2
+
+const float INTRO = 7.0;
+
+void main(){
+  float t = uTime;
+  float k = clamp(t / INTRO, 0.0, 1.0);
+  float ease = 1.0 - pow(1.0 - k, 3.0);
+
+  float px = max(2.0, floor(length(uRes) / 700.0));
+  vec2 fc = (floor(gl_FragCoord.xy / px) + 0.5) * px;
+  vec2 uv0 = (fc - 0.5 * uRes) / length(uRes);
+
+  float r = length(uv0);
+  float ang0 = atan(uv0.y, uv0.x);
+
+  float rot   = 0.09 * t + 3.2 * ease;
+  float twist = mix(14.0, 7.0, ease);
+  float a = ang0 + rot - twist * r;
+  vec2 uv = r * vec2(cos(a), sin(a));
+
+  vec2 p = uv * 27.0;
+  vec2 q = vec2(p.x + p.y);
+  float s = t * 1.8;
+  for (int i = 0; i < 5; i++) {
+    q += p + sin(p.yx * 0.9);
+    p += 0.5 * vec2(cos(4.7 + 0.37 * q.y + 0.13 * s), sin(0.95 * q.x - 0.11 * s));
+    p -= cos(p.x + p.y) - sin(0.7 * p.x - p.y);
+  }
+
+  // Every slider at 0 removes its color entirely
+  float onCream = smoothstep(0.0, 0.08, uAmt.x);
+  float onCyan  = smoothstep(0.0, 0.08, uAmt.y);
+  float onThird = smoothstep(0.0, 0.08, uAmt.z);
+
+  // Accent band: a bit wider as cyan or cream go up
+  float cm  = 1.55;
+  float cmA = mix(1.9, 1.0, max(uAmt.y, 0.6 * uAmt.x));
+  // Periodic so the bands repeat across the whole screen instead of sitting at the center
+  float paint = 1.0 - cos(length(p) * 0.55);
+  float wBlue   = max(0.0, 1.0 - cm * abs(1.0 - paint));
+  float wAccent = max(0.0, 1.0 - cmA * abs(paint));
+  float wHalo   = max(0.0, 1.0 - 0.7 * cmA * abs(paint));
+  float wDeep   = 1.0 - min(1.0, wBlue + wAccent);
+
+  // Third color takes over whole streaks
+  float selT = onThird * smoothstep(mix(0.85, -1.0, uAmt.z), mix(1.0, -0.3, uAmt.z), sin(0.25 * (p.x + p.y) + 1.3));
+
+  // Streak body: cyan (or plain blue at 0), then the third color
+  vec3 body = mix(BLUE, CYAN, onCyan);
+  vec3 tube = mix(body, uThird, selT);
+
+  // Cream is the hot center, fading into the body as a gradient
+  float lo = mix(0.95, 0.30, uAmt.x);
+  float g  = smoothstep(lo, 1.0, wAccent);
+  float creamAmt = onCream * g * g * (3.0 - 2.0 * g) * (1.0 - 0.8 * selT);
+  vec3 accent = mix(tube, CREAM, creamAmt);
+
+  vec3 col = 0.2 * BLUE * (1.0 - wAccent) + 0.8 * (BLUE * wBlue + DEEP * wDeep) + accent * wAccent;
+
+  // Neon glow from cyan and the third color only
+  vec3 glow = CYAN * onCyan * uAmt.y * (1.0 - selT) + uThird * selT;
+  col += glow * 0.25 * smoothstep(0.0, 0.7, wHalo) * (1.0 - wAccent);
+
+  col *= 1.0 - 0.25 * smoothstep(0.3, 0.75, r);
+  col = min(col, vec3(1.0));
+
+  float R = mix(-0.04, 0.78, ease);
+  float edge = R + 0.05 * ease * sin(5.0 * (ang0 + 2.5 * r) - 2.0 * t);
+  float fill = smoothstep(edge, edge - 0.10, r);
+
+  gl_FragColor = vec4(mix(NIGHT, col, fill), 1.0);
+}`;
+
+function sh(type, src){
+  const s = gl.createShader(type);
+  gl.shaderSource(s, src); gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw gl.getShaderInfoLog(s);
+  return s;
+}
+const prog = gl.createProgram();
+gl.attachShader(prog, sh(gl.VERTEX_SHADER, vert));
+gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, frag));
+gl.linkProgram(prog); gl.useProgram(prog);
+
+const buf = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+const loc = gl.getAttribLocation(prog, 'p');
+gl.enableVertexAttribArray(loc);
+gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+const uRes = gl.getUniformLocation(prog, 'uRes');
+const uTime = gl.getUniformLocation(prog, 'uTime');
+const uAmt = gl.getUniformLocation(prog, 'uAmt');
+const uThird = gl.getUniformLocation(prog, 'uThird');
+
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let t0 = performance.now();
+
+// Controls
+const THIRD = {
+  purple: { name: 'PURPLE', hex: '#c46cff', rgb: [0xc4/255, 0x6c/255, 1.0] },
+  pink:   { name: 'PINK',   hex: '#ff3ff0', rgb: [1.0, 0x3f/255, 0xf0/255] },
+};
+let third = THIRD.pink;
+const amt = [0.10, 0.80, 0.20];
+[['amtCream','valCream',0], ['amtCyan','valCyan',1], ['amtThird','valThird',2]].forEach(([id, out, i]) => {
+  const el = document.getElementById(id), o = document.getElementById(out);
+  el.addEventListener('input', () => { amt[i] = el.value / 100; o.textContent = el.value; if (reduce) draw(performance.now()); });
+});
+const btnPurple = document.getElementById('btnPurple'), btnPink = document.getElementById('btnPink');
+function setThird(key){
+  third = THIRD[key];
+  btnPurple.setAttribute('aria-pressed', key === 'purple');
+  btnPink.setAttribute('aria-pressed', key === 'pink');
+  document.getElementById('thirdSw').style.background = third.hex;
+  document.getElementById('thirdName').textContent = third.name;
+  document.getElementById('amtThird').style.accentColor = third.hex;
+  if (reduce) draw(performance.now());
+}
+btnPurple.addEventListener('click', () => setThird('purple'));
+btnPink.addEventListener('click', () => setThird('pink'));
+
+function draw(now){
+  gl.uniform2f(uRes, canvas.width, canvas.height);
+  gl.uniform1f(uTime, reduce ? 20.0 : (now - t0) / 1000);
+  gl.uniform3f(uAmt, amt[0], amt[1], amt[2]);
+  gl.uniform3f(uThird, third.rgb[0], third.rgb[1], third.rgb[2]);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+}
+function resize(){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.floor(innerWidth * dpr);
+  canvas.height = Math.floor(innerHeight * dpr);
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  if (reduce) draw(performance.now());
+}
+addEventListener('resize', resize); resize();
+
+// Click or tap the background to replay the intro
+canvas.addEventListener('click', () => { t0 = performance.now(); });
+
+function loop(now){ draw(now); requestAnimationFrame(loop); }
+if (reduce) draw(performance.now()); else requestAnimationFrame(loop);
+</script>
+
+</body></html>

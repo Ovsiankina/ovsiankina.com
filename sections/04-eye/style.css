@@ -1,0 +1,78 @@
+/* The midnight swirl page after the eye (swirl.js), not finished: a work-in-progress tag over the swirl, arrows down. */
+.s-eye {
+  --night: #03061A;    /* keep equal to colors.night in config.js (the dithered joins) */
+  --panel: rgba(3, 6, 26, 0.62);
+  --ink: #e9eefc;
+  --dim: #8f9ac4;
+  --line: rgba(233, 238, 252, 0.18);
+  --cream: #fff9c2;
+  --cyan: #2efff2;
+  --replay-fg: var(--dim);   /* core's shared replay button (core/replay.js) */
+  --replay-hover: var(--ink);
+  --pixel: 'Silkscreen', 'IBM Plex Mono', ui-monospace, monospace;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+  color-scheme: dark;
+  height: 100vh; height: 100dvh; overflow: hidden;
+  background: var(--night); color: var(--ink);
+}
+.s-eye .swirl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: pointer; }
+
+/* the work-in-progress tag, centred on the swirl, between two strips of construction tape */
+.s-eye .wip {
+  position: absolute; z-index: 2; left: 50%; top: 50%; translate: -50% -50%;
+  width: max-content; max-width: calc(100% - 32px); box-sizing: border-box;
+  margin: 0; padding: 0.7em 0.9em; pointer-events: none;
+  font: clamp(20px, 5vw, 48px)/1.15 var(--pixel); letter-spacing: 0.08em; text-transform: uppercase;
+  text-align: center; text-wrap: balance; color: var(--cream);
+  text-shadow: 0 0 14px rgba(255, 249, 194, 0.35);
+  background: var(--panel); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.s-eye .wip::before, .s-eye .wip::after {
+  content: ''; position: absolute; left: 0; right: 0; height: 6px;
+  background: repeating-linear-gradient(-45deg, var(--cream) 0 8px, transparent 8px 16px);
+  opacity: 0.85;
+}
+.s-eye .wip::before { top: 0; }
+.s-eye .wip::after { bottom: 0; }
+
+/* the arrows down to the next section: three pixel chevrons lighting up in turn on a dark panel, the whole stack bobbing */
+.s-eye .next {
+  position: absolute; z-index: 2; left: 0; right: 0; margin-inline: auto; width: max-content;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 12px 22px 14px; border: 0; cursor: pointer;
+  color: var(--cyan);
+  background: var(--panel); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  animation: s-eye-bob 1.6s ease-in-out infinite;
+}
+.s-eye .next-label {
+  margin-bottom: 6px;
+  font: 11px/1 var(--pixel); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink);
+}
+.s-eye .next .chev {
+  display: block; width: 45px; height: 25px; fill: currentColor;
+  filter: drop-shadow(0 0 5px rgba(46, 255, 242, 0.7));
+  animation: s-eye-chev 1.6s linear infinite;
+}
+.s-eye .next .chev:nth-of-type(2) { animation-delay: 0.2s; }
+.s-eye .next .chev:nth-of-type(3) { animation-delay: 0.4s; }
+.s-eye .next:hover, .s-eye .next:focus-visible { color: var(--cream); }
+.s-eye .next:focus-visible { outline: 2px dashed var(--ink); outline-offset: 2px; }
+@keyframes s-eye-chev { 0%, 100% { opacity: 0.25; } 30% { opacity: 1; } 60% { opacity: 0.25; } }
+@keyframes s-eye-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 6px; } }
+@media (prefers-reduced-motion: reduce) {
+  .s-eye .next, .s-eye .next .chev { animation: none; }
+}
+
+/* the landing jolt once the white has shut */
+.s-eye.shake { animation: s-eye-shake 0.28s steps(2) 1; }
+@keyframes s-eye-shake {
+  0% { transform: translate(6px, -4px); } 25% { transform: translate(-5px, 3px); }
+  50% { transform: translate(3px, 2px); } 75% { transform: translate(-2px, -1px); } 100% { transform: none; }
+}
+
+/* the lead-in: the original's end screen, the horizon glow growing in it (colours from config.leadIn);
+   once the transition has played it folds into a short purple break, glow gone */
+.s-eye-leadin { height: 100vh; overflow: hidden; background: var(--leadin-bg); }
+.s-eye-leadin.folded { height: var(--leadin-folded); }
+.s-eye-leadin .glow { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; pointer-events: none; }

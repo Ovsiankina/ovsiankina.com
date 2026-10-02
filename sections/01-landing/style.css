@@ -1,0 +1,134 @@
+/* Layout: one golden rectangle fitted to the viewport. Its first square holds the CV,
+   the remainder column holds the A6 photo, centred on the spiral's pole.
+   On portrait screens the rectangle stands up: photo square on top, CV header below, the rest of the CV on a sheet.
+   Colours (--bg, --ink, --text, --dim, --geo) come from config.js palette, set on the section by section.js. */
+.s-landing {
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --pixel: "Silkscreen", "IBM Plex Mono", ui-monospace, monospace;
+  --fs: 13px;
+  --replay-fg: var(--dim); --replay-hover: var(--ink);   /* core's shared replay button (core/replay.js) */
+  color-scheme: dark;
+  background: var(--bg); color: var(--text); font-family: var(--mono);
+  padding-bottom: var(--bottom-gap, 0px);
+}
+
+.s-landing .hero { position: relative; height: 100vh; height: 100svh; min-height: 560px; overflow: hidden; }
+.s-landing .hero canvas { position: absolute; left: 0; top: 0; image-rendering: pixelated; pointer-events: none; }
+.s-landing .geo { z-index: 3; }
+.s-landing .more { z-index: 3; }
+
+/* swipe hint over the CV square (swipe-hint.js): one pass when the intro is over, if the CV scrolls */
+.s-landing .hint-box { position: absolute; z-index: 3; pointer-events: none; }
+.s-landing .swipe-hint { position: absolute; inset: 0; overflow: hidden; }
+.s-landing .swipe-hint canvas { position: absolute; left: 0; top: 0; display: block; image-rendering: pixelated; }
+.s-landing .swipe-hint canvas.ascii { width: 100%; height: 100%; }
+/* CRT scanlines, one dark line per hand pixel row */
+.s-landing .swipe-hint::after {
+  content: ''; position: absolute; inset: 0; opacity: var(--hint-a, 0);
+  background: repeating-linear-gradient(to bottom, transparent 0 calc(var(--scan, 4px) - 1px), rgba(0,0,0,.32) calc(var(--scan, 4px) - 1px) var(--scan, 4px));
+}
+
+/* ---------- photo ---------- */
+.s-landing .frame { position: absolute; z-index: 2; cursor: pointer; }
+.s-landing .frame canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: auto; }
+.s-landing .frame:focus-visible { outline: 1px dashed var(--geo); outline-offset: 10px; }
+.s-landing .caption {
+  position: absolute; right: 8px; top: 8px; padding: 4px 6px; background: var(--bg);
+  font: 9px/1 var(--pixel); letter-spacing: .08em; color: var(--dim);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+
+/* ---------- ratio labels on each square ---------- */
+.s-landing .lbl {
+  position: absolute; z-index: 3; pointer-events: none;
+  font: 8px/1 var(--pixel); letter-spacing: .06em; color: var(--geo);
+  opacity: 0; transition: opacity .8s steps(4);
+}
+.s-landing .lbl.on { opacity: .42; }
+.s-landing .lbl.snap { transition: none; }
+
+/* ---------- CV ---------- */
+.s-landing .cv {
+  position: absolute; z-index: 1; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain;
+  scrollbar-width: thin; scrollbar-color: var(--dim) transparent;
+  font-size: var(--fs); line-height: 1.5; color: var(--text);
+  display: flex; flex-direction: column; gap: 1.6em;
+}
+.s-landing .cv header { display: flex; flex-direction: column; gap: .35em; }
+.s-landing .cv h1 {
+  margin: 0 0 .25em; font: 400 calc(var(--fs) * 2.55)/1 var(--pixel);
+  color: var(--ink); letter-spacing: .02em; text-wrap: balance;
+}
+.s-landing .cv .role { color: var(--ink); font-weight: 500; }
+.s-landing .cv .avail { color: var(--text); }
+.s-landing .cv .cols { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr); gap: 2.2em; }
+.s-landing .cv .col { display: flex; flex-direction: column; gap: 1.5em; min-width: 0; }
+.s-landing .cv section { display: flex; flex-direction: column; gap: .45em; }
+.s-landing .cv h2 {
+  margin: 0; font: 400 calc(var(--fs) * .78)/1.4 var(--pixel);
+  letter-spacing: .14em; color: var(--geo);
+}
+.s-landing .cv p { margin: 0; }
+.s-landing .cv ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: .3em; }
+.s-landing .cv li { position: relative; padding-left: 1.4em; }
+.s-landing .cv li::before { content: "+"; position: absolute; left: 0; color: var(--dim); }
+.s-landing .cv .job { display: flex; justify-content: space-between; gap: 1em; flex-wrap: wrap; color: var(--ink); }
+.s-landing .cv .when { color: var(--dim); font-variant-numeric: tabular-nums; }
+.s-landing .cv dl { margin: 0; display: flex; flex-direction: column; gap: .55em; }
+.s-landing .cv dt { color: var(--ink); }
+.s-landing .cv dd { margin: 0; }
+.s-landing .cv a { color: var(--ink); text-decoration: none; border-bottom: 1px dotted var(--dim); }
+.s-landing .cv a:hover, .s-landing .cv a:focus-visible { border-bottom-color: var(--ink); outline: none; }
+.s-landing .cv em { font-style: normal; color: var(--ink); }
+
+/* typewriter: every glyph is a span, hidden until the pen reaches it (layout never moves) */
+.s-landing .cv .c { visibility: hidden; }
+.s-landing .cv .c.on { visibility: visible; }
+.s-landing .cv .c.head { background: var(--ink); color: var(--bg); }
+.s-landing .cursor { display: inline-block; width: .6em; height: 1.05em; vertical-align: -.18em; background: var(--ink); margin-left: .2em; visibility: hidden; }
+.s-landing .cursor.on { visibility: visible; animation: landing-blink 1.1s steps(1) infinite; }
+@keyframes landing-blink { 50% { opacity: 0; } }
+
+/* all the text fits in the square: not a scroller, the wheel goes to the page */
+.s-landing .cv.fits { overflow: visible; overscroll-behavior: auto; }
+
+.s-landing .cv::-webkit-scrollbar { width: 6px; }
+.s-landing .cv::-webkit-scrollbar-thumb { background: var(--dim); }
+.s-landing .cv::-webkit-scrollbar-track { background: transparent; }
+.s-landing .cv:focus-visible { outline: 1px dashed var(--geo); outline-offset: -4px; }
+
+/* conventional PDF CV: fills the .236 square exactly */
+.s-landing .dl {
+  position: absolute; z-index: 4;
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 18px; background: var(--ink); color: var(--bg); text-decoration: none; overflow: hidden;
+}
+.s-landing .dl-top { display: flex; flex-direction: column; gap: 6px; }
+.s-landing .dl-t { font: 400 12px/1.25 var(--pixel); letter-spacing: .06em; text-transform: uppercase; }
+.s-landing .dl-s { font: 400 11px/1.3 var(--mono); opacity: .7; }
+.s-landing .dl-short { display: none; font: 400 16px/1 var(--pixel); letter-spacing: .06em; }
+.s-landing .dl svg { align-self: flex-end; width: 21px; height: 24px; shape-rendering: crispEdges; fill: currentColor; }
+.s-landing .dl:hover, .s-landing .dl:focus-visible { background: var(--bg); color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); outline: none; }
+.s-landing .dl:hover svg, .s-landing .dl:focus-visible svg { animation: landing-nudge .6s steps(2) infinite; }
+@keyframes landing-nudge { 50% { transform: translateY(2px); } }
+/* small square (phones): short label */
+.s-landing .dl.compact .dl-t { display: none; }
+.s-landing .dl.compact .dl-short { display: block; }
+.s-landing .dl.compact .dl-s { font-size: 10px; }
+.s-landing .dl.compact svg { width: 14px; height: 16px; }
+
+/* portrait: the hero is one screen, held in place (sticky) with the CV header in its "1" square;
+   the CV body is a sheet under it that slides up over it, a dithered top edge (--edge, built by section.js) */
+.s-landing .hero.port { position: sticky; top: 0; z-index: 0; }
+.s-landing .hero.port .cv { overflow: visible; }
+.s-landing .cv.sheet { display: none; }
+.s-landing.port .cv.sheet {
+  display: block; position: relative; z-index: 1; overflow: visible; overscroll-behavior: auto;
+  min-height: 100svh; padding: 40px var(--side) 72px; background: var(--bg);
+}
+.s-landing .sheet .cols { grid-template-columns: minmax(0, 1fr); gap: 1.5em; }
+.s-landing .sheet::before {
+  content: ''; position: absolute; left: 0; right: 0; top: calc(-8 * var(--px)); height: calc(8 * var(--px));
+  background: var(--edge) repeat-x left top / calc(8 * var(--px)) calc(8 * var(--px)); image-rendering: pixelated;
+}
+.s-landing .veil { z-index: 59; }

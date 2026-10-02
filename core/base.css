@@ -1,0 +1,47 @@
+/* Site shell: the sections stack in one scrolling document, in the order of sections/sections.js.
+   Each section styles itself under its own root class (.s-<id>); nothing here is section specific. */
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #070707; }
+[hidden] { display: none !important; }
+
+#site { position: relative; }
+#site > .section, #site > .leadin { position: relative; }
+
+/* the dithered joins between blocks (core/seam.js) */
+#site > .seam { display: block; position: relative; pointer-events: none; image-rendering: pixelated; }
+
+/* the replay button every section uses (core/replay.js); place it inside a positioned box */
+.replay-btn {
+  position: absolute; z-index: 60; right: 16px; bottom: 14px;
+  background: none; border: 0; padding: 6px 4px; cursor: pointer;
+  font: 9px/1 "Silkscreen", "IBM Plex Mono", ui-monospace, monospace; letter-spacing: .12em;
+  color: var(--replay-fg, #5e5a53);
+}
+.replay-btn:hover, .replay-btn:focus-visible { color: var(--replay-hover, #ebe7de); outline: none; }
+
+/* transition layers: the frozen copy of the screen, then the transition's own drawing on top */
+.freeze, .tx-layer {
+  position: fixed; inset: 0; overflow: hidden; pointer-events: none;
+}
+.freeze { z-index: 900; pointer-events: auto; }   /* swallows clicks meant for the live page underneath */
+.tx-layer { z-index: 910; }
+.freeze > .ghost { position: absolute; margin: 0; }
+.freeze > .seam { image-rendering: pixelated; }
+
+/* admin shell (~) */
+.shell {
+  position: fixed; left: 12px; top: 12px; z-index: 1000;
+  width: min(560px, calc(100vw - 24px));
+  padding: 10px 12px; background: rgba(7, 7, 7, .92); border: 1px solid #3a3833;
+  font: 12px/1.5 "IBM Plex Mono", ui-monospace, monospace; color: #a8a39a;
+}
+.shell .out { margin: 0; max-height: 40vh; overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
+.shell .out:empty { display: none; }
+.shell .out .ok { color: #ebe7de; }
+.shell .out .err { color: #d9826b; }
+.shell form { display: flex; gap: .6em; align-items: baseline; }
+.shell label { color: #5e5a53; white-space: nowrap; }
+.shell input {
+  flex: 1; min-width: 0; padding: 0; border: 0; outline: none; background: none;
+  font: inherit; color: #ebe7de; caret-color: #ebe7de;
+}

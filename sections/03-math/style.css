@@ -1,0 +1,54 @@
+/* Maths section. Desktop: copy column on the left, zeta trace on the right. Portrait: copy on top, trace below.
+   Everything drawn sits on the landing page's 2 px pixel grid with 8x8 Bayer dithering.
+   .s-math is both the section root (.section.s-math) and the transition's drawing box in the overlay (.s-math.tx),
+   so the custom properties below reach both. The canvases read them with getComputedStyle. */
+.s-math {
+  /* colours: config.palette, set on this element by section.js (root) and transition.js (overlay box) */
+  --mono:  "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --pixel: "Silkscreen", "IBM Plex Mono", ui-monospace, monospace;
+  color-scheme: dark;
+  --replay-fg: var(--dim);     /* core's shared replay button (core/replay.js) */
+  --replay-hover: var(--ink);
+}
+
+/* ---------- maths section ---------- */
+/* no position here: the core positions the root (relative in the page, absolute in its frozen copy) */
+.section.s-math {
+  min-height: 100vh; min-height: 100svh; overflow: hidden;
+  background: var(--bg); color: var(--text); font-family: var(--mono);
+}
+.s-math canvas.trace { position: absolute; left: 0; top: 0; image-rendering: pixelated; pointer-events: none; }
+.s-math .copy {
+  position: absolute; z-index: 2; left: max(16px, 6vw); top: 50%; transform: translateY(-50%);
+  width: min(34ch, 34vw); display: flex; flex-direction: column; gap: 1.1em;
+  font-size: 14px; line-height: 1.6;
+}
+.s-math .copy h2 { margin: 0; font: 400 34px/1 var(--pixel); color: var(--ink); letter-spacing: .02em; }
+.s-math .copy p { margin: 0; }
+.s-math .copy em { font-style: normal; color: var(--ink); }
+.s-math .copy .cap { font: 9px/1.7 var(--pixel); letter-spacing: .08em; color: var(--geo); opacity: .75; }
+.s-math .stage { position: absolute; left: calc(max(16px, 6vw) + min(34ch, 34vw) + 4vw); right: 0; top: 0; bottom: 0; }
+
+.s-math .zlabel {
+  position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; white-space: nowrap;
+  font: 400 13px/1 var(--mono); color: var(--ink); font-variant-numeric: tabular-nums;
+}
+
+/* portrait: copy in flow on top, trace below */
+.s-math.port .copy { position: relative; left: auto; top: auto; transform: none; width: auto; max-width: 60ch; padding: 68px 16px 0; }
+.s-math.port .zlabel { font-size: 11px; }
+.s-math.port .copy h2 { font-size: 26px; }
+.s-math.port .stage { position: relative; left: auto; height: 62svh; min-height: 340px; }
+
+/* ---------- lead-in: the approach block just above the section (leadin.js) ---------- */
+.s-math-leadin { height: var(--leadin-h); overflow: hidden; background: var(--leadin-black); }
+.s-math-leadin canvas { position: absolute; left: 0; top: 0; image-rendering: pixelated; pointer-events: none; }
+
+/* ---------- transition (drawn inside the core's overlay layer) ---------- */
+.s-math.tx { position: absolute; inset: 0; pointer-events: none; }
+.s-math.tx canvas { position: absolute; left: 0; top: 0; image-rendering: pixelated; }
+.s-math.tx .cap {
+  position: absolute; left: 16px; bottom: 16px; padding: 4px 6px; background: var(--bg); color: var(--geo);
+  font: 9px/1 var(--pixel); letter-spacing: .1em; opacity: 0; transition: opacity .5s steps(3);
+}
+.s-math.tx .cap.on { opacity: .85; }
