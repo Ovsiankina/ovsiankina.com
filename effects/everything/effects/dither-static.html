@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dither Static</title>
+<style>
+  html { background: #000; }
+  body { margin: 0; min-height: 100vh; }
+  #dither-static {
+    position: fixed; inset: 0;
+    width: 100vw; height: 100vh;
+    z-index: -1;
+    pointer-events: none;
+    image-rendering: pixelated;
+  }
+</style>
+</head>
+<body>
+<canvas id="dither-static"></canvas>
+
+<script>
+(() => {
+  // How the reference is made: Hyprland blur with `noise = 0.5` over a near-black
+  // background, then quantized to a coarse RGB palette with Floyd-Steinberg error
+  // diffusion. Error diffusion on an almost-black input is what draws the sparse
+  // red/green/blue dots into diagonal "worm" streaks.
+  const CONFIG = {
+    base:   [0.55, 0.5, 0.5],  // input level per channel, 0-255 units (reference ~0.5)
+    noise:  0.5,                // random amplitude added per pixel/channel before dithering
+    levels: [8, 8, 4],         // palette steps per channel (reference: R/G step 36, B step 85)
+    boost:  1.0,               // multiplies output; >1 makes it more visible on dim screens
+    tile:   384,               // tile size in CSS px
+    frames: 6,                 // pre-rendered tiles cycled for the flicker
+    fps:    10,                // reference GIF runs at 100 ms/frame
+    scale:  1,                 // CSS px per dot
+  };
+
+  function renderTile(size) {
+    const [L0, L1, L2] = CONFIG.levels;
+    const steps = [255 / (L0 - 1), 255 / (L1 - 1), 255 / (L2 - 1)];
+    // dither a bigger buffer and crop the middle: error diffusion needs a warm-up
+    // distance before dots appear, which otherwise leaves empty bands at tile seams
+    const M = 128, W = size + 2 * M, n = W * W;
+    const img = new ImageData(size, size);
+    const d = img.data;
+    for (let c = 0; c < 3; c++) {
+      const b = new Float32Array(n), s = steps[c];
+      for (let i = 0; i < n; i++)
+        b[i] = Math.max(0, CONFIG.base[c] + (Math.random() - 0.5) * 2 * CONFIG.noise);
+      for (let y = 0; y < W; y++) {
+        for (let x = 0; x < W; x++) {
+          const i = y * W + x;
+          const old = b[i];
+          const q = Math.min(255, Math.round(old / s) * s);
+          const err = old - q;
+          if (x + 1 < W) b[i + 1] += err * 7 / 16;
+          if (y + 1 < W) {
+            if (x > 0) b[i + W - 1] += err * 3 / 16;
+            b[i + W] += err * 5 / 16;
+            if (x + 1 < W) b[i + W + 1] += err * 1 / 16;
+          }
+          const cx = x - M, cy = y - M;
+          if (cx >= 0 && cx < size && cy >= 0 && cy < size)
+            d[(cy * size + cx) * 4 + c] = Math.min(255, q * CONFIG.boost);
+        }
+      }
+    }
+    for (let i = 0; i < size * size; i++) d[i * 4 + 3] = 255;
+
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = size;
+    cv.getContext('2d').putImageData(img, 0, 0);
+    return cv;
+  }
+
+  const canvas = document.getElementById('dither-static');
+  const ctx = canvas.getContext('2d');
+  const tiles = Array.from({ length: CONFIG.frames }, () => renderTile(CONFIG.tile));
+  const patterns = tiles.map(t => ctx.createPattern(t, 'repeat'));
+
+  function resize() {
+    canvas.width  = Math.ceil(innerWidth  / CONFIG.scale);
+    canvas.height = Math.ceil(innerHeight / CONFIG.scale);
+  }
+  addEventListener('resize', resize);
+  resize();
+
+  let f = 0;
+  function draw() {
+    // random offset each frame so tile repeats never line up visibly
+    const ox = (Math.random() * CONFIG.tile) | 0, oy = (Math.random() * CONFIG.tile) | 0;
+    ctx.setTransform(1, 0, 0, 1, ox, oy);
+    ctx.fillStyle = patterns[f];
+    ctx.fillRect(-ox, -oy, canvas.width, canvas.height);
+    f = (f + 1) % patterns.length;
+  }
+  draw();
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches)
+    setInterval(draw, 1000 / CONFIG.fps);
+})();
+</script>
+</body>
+</html>
