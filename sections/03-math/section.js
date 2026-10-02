@@ -48,13 +48,16 @@ for (let i = 1; i < COUNT - 1; i++) if (MAG[i] < 0.03 && MAG[i] <= MAG[i - 1] &&
   ZEROS.push((a + b) / 2);
 }
 
+// the inside of .copy, rewritten on a language switch
+const copyText = () => `
+    <h2>${content.heading}</h2>
+    ${content.paragraphs.map(p => `<p>${p}</p>`).join('\n    ')}
+    <div class="cap">${content.caption}</div>`;
+
 function markup() {
   return `
   <canvas class="trace" aria-hidden="true"></canvas>
-  <div class="copy">
-    <h2>${content.heading}</h2>
-    ${content.paragraphs.map(p => `<p>${p}</p>`).join('\n    ')}
-    <div class="cap">${content.caption}</div>
+  <div class="copy">${copyText()}
   </div>
   <div class="stage"></div>
   <div class="zlabel" aria-hidden="true"></div>`;
@@ -305,5 +308,12 @@ export async function mount(root, env) {
     restart,                                       // the transition starts the trace over, alive underneath
     onEnter() { paused = false; Z.running = true; kick(); },
     onLeave() { paused = true; io.unobserve(root); io.observe(root); },   // re-observe: resumes if still on screen afterwards
+    words: () => [copyEl, replayEl],
+    relang() {
+      root.setAttribute('aria-label', content.ariaLabel);
+      copyEl.innerHTML = copyText();
+      replayEl.textContent = content.replay;
+      zLayout(); zRender();                        // the portrait layout depends on the copy's height
+    },
   };
 }

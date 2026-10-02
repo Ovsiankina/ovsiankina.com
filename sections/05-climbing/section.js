@@ -49,5 +49,10 @@ export async function mount(root, env) {
     hold: () => { replay.classList.add('held'); scene.hold(); },       // the transition blanks the scene under its cover
     onEnter: () => { replay.classList.remove('held'); scene.enter(); }, // every arrival through a transition plays holds -> climber -> title from the start
     onLeave: () => scene.pause(),
+    words: () => [replay],
+    relang() {
+      replay.textContent = content.replay;
+      $('.title').setAttribute('aria-label', content.titleLabel);
+    },
   };
 }

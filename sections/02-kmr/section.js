@@ -15,16 +15,19 @@ export const edges = { top: config.colors['--black'], bottom: config.colors['--b
 
 const plain = html => html.replace(/<[^>]*>/g, '').replace(/"/g, '&quot;');   // for aria-label attributes
 
-function copy(c) {
+// the inside of a .copy, rewritten on a language switch
+function copyText(c) {
   const [first, ...rest] = c.label;
   const paras = c.paragraphs.map((p, i) => `<p>${p}${i === c.paragraphs.length - 1 ? '<span class="cursor"></span>' : ''}</p>`).join('');
-  return `<div class="copy">
+  return `
     <div class="label"><b>${first}</b>${rest.map(s => `<span>${s}</span>`).join('')}</div>
     <h2>${c.title}</h2>
     ${paras}
-    <div class="stack">${c.stack.join('<i>/</i>')}</div>
-  </div>`;
+    <div class="stack">${c.stack.join('<i>/</i>')}</div>`;
 }
+const copy = c => `<div class="copy">${copyText(c)}</div>`;
+// sub-section root -> its key in content.js
+const BLOCKS = { '.ax-kmr': 'kmr', '.ax-summit': 'summit', '.xiao': 'xiao' };
 
 const swimmerBlock = (cls, side, c) => `
 <section class="ax ${cls}" data-text="${side}" aria-label="${plain(c.title)}">
@@ -81,6 +84,19 @@ export async function mount(root, env) {
     hold(on) { kmr.hold(on); },
     onEnter() { parts.forEach(p => p.resume()); },
     onLeave() { parts.forEach(p => p.pause()); },
+    words: () => [...root.querySelectorAll('.copy, .ctrl')],
+    relang() {
+      for (const [sel, key] of Object.entries(BLOCKS)) {
+        const sub = root.querySelector(sel), c = content[key];
+        sub.setAttribute('aria-label', plain(c.title));
+        sub.querySelector('.copy').innerHTML = copyText(c);   // the swimmers follow the new size on their own
+      }
+      const v = content.xiao.viewer;
+      root.querySelector('.xiao .stage').setAttribute('aria-label', v.ariaLabel);
+      root.querySelector('.xiao .seg').setAttribute('aria-label', v.modesLabel);
+      for (const b of root.querySelectorAll('.xiao .seg button')) b.textContent = v.modes[b.dataset.mode];
+      root.querySelector('.xiao .hint').textContent = v.hint;
+    },
   };
   inst.ready.catch(e => console.error('[02-kmr]', e));
   return inst;

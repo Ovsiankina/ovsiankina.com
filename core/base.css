@@ -45,3 +45,16 @@ html, body { margin: 0; background: #070707; }
   flex: 1; min-width: 0; padding: 0; border: 0; outline: none; background: none;
   font: inherit; color: #ebe7de; caret-color: #ebe7de;
 }
+
+/* language switch (core/lang.js): top centre, above the transitions, under the admin shell */
+.lang-switch {
+  position: fixed; z-index: 950; top: 8px; left: 50%; transform: translateX(-50%);
+  display: flex; border: 1px solid #3a3833; background: rgba(7, 7, 7, .88);
+  font: 9px/1 "Silkscreen", "IBM Plex Mono", ui-monospace, monospace; letter-spacing: .1em;
+}
+.lang-switch button {
+  padding: 7px 10px; border: 0; background: none; cursor: pointer;
+  font: inherit; letter-spacing: inherit; color: #5e5a53;
+}
+.lang-switch button:hover, .lang-switch button:focus-visible { color: #ebe7de; outline: none; }
+.lang-switch button[aria-pressed="true"] { background: #ebe7de; color: #070707; cursor: default; }

@@ -256,7 +256,8 @@ export function swimmer(root, cfg, opts) {
     // frozen views replay the last 2 s so wakes and ripples are there too
     const settle = () => { const T = tStill(); for (let s = Math.max(0, T - 2); s < T; s += 1 / CONFIG.tick) drawAscii(s); render(T); };
     const relayout = () => { resize(); if (still) settle(); };
-    new ResizeObserver(relayout).observe(root);
+    const ro = new ResizeObserver(relayout);
+    ro.observe(root); ro.observe(copy);                           // the copy too: a language switch resizes it
     fontLate(relayout);                                           // the webfont came in late: new cell size
     if (still) { settle(); return; }
     // -1px: touching the screen edge is not on screen (see xiao.js)

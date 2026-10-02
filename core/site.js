@@ -15,6 +15,10 @@
 //                    the replay button is core/replay.js: replayButton(parent, label, onClick)
 //                    instance (all optional): onEnter({ via })  the section is now the one on screen
 //                                             onLeave()         another section is taking over: pause
+//                                             words()           the elements holding its text, dithered out and
+//                                                               back in around a language switch (core/lang.js)
+//                                             relang()          put the text in the new language; content.js
+//                                                               already reads in it
 //   transition.js  export async function play(t), resolves when the target is fully uncovered
 //                    t = { ghost, layer, root, section, index, from, via, reduced }
 //                    ghost: frozen copy of the screen as it was, fixed, above the live target (clip it, hide it)
@@ -25,6 +29,7 @@ import list from '../sections/sections.js';
 import { createNavigator } from './navigator.js';
 import { createShell } from './shell.js';
 import { createSeams } from './seam.js';
+import { lang, LANGS, langSwitch } from './lang.js';
 
 const site = document.getElementById('site');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -90,6 +95,18 @@ await Promise.all(sections.map(s => s.mounted));
 seams = createSeams(site, flow);
 nav.remember();
 
+const swap = langSwitch(nav, sections);
+command('lang', {
+  usage: 'lang [en|fr]', about: 'show or switch the site language',
+  run: async ([arg], print) => {
+    if (arg === undefined) { print(`lang: ${lang}`); return; }
+    const l = arg.toLowerCase();
+    if (!LANGS.includes(l)) { print(`lang: expected ${LANGS.join(' or ')}, got "${arg}"`, 'err'); return; }
+    if (l === lang) { print(`lang: already ${l}`); return; }
+    if (await swap(l)) print(`lang: ${l}`, 'ok');
+    else print('lang: busy (a transition or a switch is running), try again', 'err');
+  },
+});
 createShell(nav, sections, commands);
 window.__site = { nav, sections, goTo: (n, o) => nav.goTo(n, o) };   // console / test access
 

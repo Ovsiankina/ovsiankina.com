@@ -83,10 +83,18 @@ export async function mount(root, env) {
   let swirl = null;
   try { swirl = createSwirl(canvas, { reduced: env.reduced }); } catch (e) { console.error('[eye] swirl', e); }   // no WebGL: plain night
 
-  root.querySelector('.next').addEventListener('click', () => env.nav.goTo(env.index + 1));
-  replayButton(root, c.replay, () => env.nav.goTo(env.index));
+  const wip = root.querySelector('.wip'), next = root.querySelector('.next'), nextLabel = root.querySelector('.next-label');
+  next.addEventListener('click', () => env.nav.goTo(env.index + 1));
+  const replayEl = replayButton(root, c.replay, () => env.nav.goTo(env.index));
+  const words = () => [wip, nextLabel, replayEl];
+  function relang() {
+    wip.textContent = c.wip;
+    nextLabel.textContent = c.next;
+    next.setAttribute('aria-label', c.nextLabel);
+    replayEl.textContent = c.replay;
+  }
   root.addEventListener('animationend', () => root.classList.remove('shake'));
-  if (!swirl) return {};
+  if (!swirl) return { words, relang };
 
   canvas.addEventListener('click', () => swirl.replay());   // click or tap the swirl to replay its bloom
   new ResizeObserver(() => swirl.draw()).observe(canvas);
@@ -108,5 +116,7 @@ export async function mount(root, env) {
   return {
     onEnter: () => { entered = true; swirl.start(); },   // every arrival through the eye blooms from the night
     onLeave: () => swirl.pause(),
+    words,
+    relang,
   };
 }

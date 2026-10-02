@@ -2,7 +2,7 @@
 // first square, the photo carousel (ordered-dither transitions) in the .618 square, the PDF in the .236 one.
 import content from './content.js';
 import config from './config.js';
-import { BAYER, pack, rgb } from './dither.js';
+import { BAYER, pack, rgb } from '../../core/dither.js';
 import { replayButton } from '../../core/replay.js';
 import { swipeHint } from './swipe-hint.js';
 
@@ -46,6 +46,16 @@ const block = b => `<section><h2>${b.heading}</h2>`
   + (b.list ? `<dl>${b.list.map(([t, d]) => `<div><dt>${t}</dt><dd>${d}</dd></div>`).join('')}</dl>` : '')
   + '</section>';
 
+// the parts rewritten on a language switch
+const head = c => `<h1>${c.name}</h1>
+      <div class="role">${c.role}</div>
+      <div class="avail">${c.avail}</div>`;
+const body = c => `<div class="col">${c.left.map(block).join('')}</div>
+      <div class="col">${c.right.map(block).join('')}</div>`;
+const dlText = c => `<span class="dl-t">${c.download.title}</span>
+      <span class="dl-short">${c.download.short}</span>
+      <span class="dl-s">${c.download.sub}</span>`;
+
 const markup = c => `
 <div class="hero">
   <canvas class="geo" aria-hidden="true"></canvas>
@@ -55,22 +65,11 @@ const markup = c => `
     <div class="caption">01 / ${String(config.photos.length).padStart(2, '0')}</div>
   </div>
   <article class="cv" tabindex="0">
-    <header>
-      <h1>${c.name}</h1>
-      <div class="role">${c.role}</div>
-      <div class="avail">${c.avail}</div>
-    </header>
-    <div class="cols">
-      <div class="col">${c.left.map(block).join('')}</div>
-      <div class="col">${c.right.map(block).join('')}</div>
-    </div>
+    <header>${head(c)}</header>
+    <div class="cols">${body(c)}</div>
   </article>
   <a class="dl" href="${asset(config.cv.pdf)}" download="${config.cv.filename}" aria-label="${c.download.label}">
-    <span class="dl-top">
-      <span class="dl-t">${c.download.title}</span>
-      <span class="dl-short">${c.download.short}</span>
-      <span class="dl-s">${c.download.sub}</span>
-    </span>
+    <span class="dl-top">${dlText(c)}</span>
     <svg viewBox="0 0 7 8" aria-hidden="true"><rect x="3" y="0" width="1" height="5"/><rect x="1" y="3" width="1" height="1"/><rect x="5" y="3" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="4" y="4" width="1" height="1"/><rect x="0" y="7" width="7" height="1"/></svg>
   </a>
 </div>`;
@@ -94,6 +93,7 @@ export async function mount(root, env) {
   const countEl = root.querySelector('.caption');
   const dl = root.querySelector('.dl');
   const cols = root.querySelector('.cols');
+  const header = cv.querySelector('header'), dlTop = root.querySelector('.dl-top');
 
   // portrait: the hero is a cover held on screen, the CV body leaves the square for a sheet that slides up over it
   // (still a .cv, so it keeps the CV styles and the typewriter); the veil dissolves the cover as the sheet climbs
@@ -106,15 +106,14 @@ export async function mount(root, env) {
   const vctx = veil.getContext('2d');
   const cursor = document.createElement('span');
   cursor.className = 'cursor';
-  const paras = cv.querySelectorAll('p');
-  (paras[paras.length - 1] || cv).appendChild(cursor);
 
   const css = getComputedStyle(root);
   const C_GEO = rgb(css.getPropertyValue('--geo')), C_INK = rgb(css.getPropertyValue('--ink')), C_BG = rgb(css.getPropertyValue('--bg'));
 
   // ---------- CV: wrap every glyph so the pen can reveal it without reflow ----------
-  const glyphs = [];
-  (function wrap(node) {
+  // again after a language switch, on the new text (the cols may have moved to the portrait sheet by then)
+  let glyphs = [], N = 0;
+  function wrap(node) {
     for (const ch of [...node.childNodes]) {
       if (ch.nodeType === 3) {
         const frag = document.createDocumentFragment();
@@ -126,8 +125,13 @@ export async function mount(root, env) {
         ch.replaceWith(frag);
       } else if (ch.nodeType === 1 && ch !== cursor) wrap(ch);
     }
-  })(cv);
-  const N = glyphs.length;
+  }
+  function wrapCV() {
+    const paras = cols.querySelectorAll('p');
+    (paras[paras.length - 1] || cols).appendChild(cursor);
+    glyphs = []; wrap(header); wrap(cols); N = glyphs.length;
+  }
+  wrapCV();
   const NOISE = '#%&@$*+=/\\<>?!01';
   let shown = 0, scrambled = [];
   function reveal(n) {
@@ -564,7 +568,7 @@ export async function mount(root, env) {
 
   frameEl.addEventListener('click', next);
   frameEl.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); next(); } });
-  replayButton(hero, content.replay, () => {
+  const replayEl = replayButton(hero, content.replay, () => {
     if (held) return;                        // under an incoming transition (the frozen copy lets clicks through)
     cv.scrollTop = 0;
     held = false; startIntro(); resume();
@@ -644,5 +648,20 @@ export async function mount(root, env) {
       ready.then(() => { held = false; startIntro(); resume(); });
     },
     onLeave() { pause(); },
+    words: () => [header, cols, dlTop, replayEl],
+    relang() {
+      const part = N ? shown / N : 1;            // as much of the new text written as there was of the old
+      root.setAttribute('aria-label', content.label);
+      frameEl.setAttribute('aria-label', content.photoLabel);
+      dl.setAttribute('aria-label', content.download.label);
+      dlTop.innerHTML = dlText(content);
+      replayEl.textContent = content.replay;
+      header.innerHTML = head(content);
+      cols.innerHTML = body(content);
+      scrambled = []; shown = 0;
+      wrapCV();
+      reveal(Math.round(part * N));
+      fitCV();
+    },
   };
 }

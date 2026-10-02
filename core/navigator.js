@@ -11,6 +11,8 @@ const WATCHDOG = 20000;   // ms: a transition that never resolves (stalled asset
 export function createNavigator(sections, blocks) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let busy = false;
+  const watchers = [];
+  const setBusy = on => { busy = on; for (const f of watchers) f(on); };
 
   // ---------- scroll lock ----------
   // The scrollbar stays (hiding it would reflow every section under the cover); input is blocked instead,
@@ -38,7 +40,7 @@ export function createNavigator(sections, blocks) {
   async function goTo(n, { via = 'jump' } = {}) {
     const s = sections[n - 1];
     if (!s || busy) return false;
-    busy = true;
+    setBusy(true);
     await s.mounted;
 
     // walking down: freeze what is above the join flush with the bottom of the screen, as it was left
@@ -70,7 +72,7 @@ export function createNavigator(sections, blocks) {
     ghost.remove(); layer.remove();
     remember();
     lastY = scrollY;
-    busy = false;
+    setBusy(false);
     s.instance?.onEnter?.({ via });
     return true;
   }
@@ -101,6 +103,7 @@ export function createNavigator(sections, blocks) {
     goTo,
     remember,
     get busy() { return busy; },
+    watch(f) { watchers.push(f); },          // f(busy): called as a transition starts (true) and ends (false)
     get current() { return here().index; },
   };
 }

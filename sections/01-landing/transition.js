@@ -4,7 +4,7 @@
 // first frame of its intro, which starts on arrival. That first frame is bg plus the solid PDF square,
 // so the square's pixels dissolve into ink instead, and the last frame is exactly what is live.
 import config from './config.js';
-import { BAYER, pack, rgb } from './dither.js';
+import { BAYER, pack, rgb } from '../../core/dither.js';
 
 const frame = () => new Promise(requestAnimationFrame);
 
