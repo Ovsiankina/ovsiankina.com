@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ovsiankina Eye Transition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500&display=swap">
+<style>
+  /* Layout: the purple landing hero, CV sections below, a full-screen horizon at the very end that floods into the transition. Single dark look by design. */
+  :root {
+    color-scheme: dark;
+    --site: #1B0D2E;
+    --fg: #E9E1F5;
+    --muted: #C9BEDB;
+    --line: #6E5A8E;
+    --link: #C9B3F0;
+    --green: #08170F;
+    --green-fg: #DCEBDF;
+    --green-muted: #9DB8A5;
+    --green-line: #2F5A40;
+    --ink: #1B0D2E;
+    --paper: #FFFFFF;
+    --sans: 'Space Grotesk', system-ui, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+  [hidden] { display: none !important; }
+  html { background: var(--site); }
+  body { background: var(--site); color: var(--fg); font-family: var(--sans); margin: 0; }
+  a { color: var(--link); } a:hover { color: var(--fg); }
+  button:focus-visible { outline: 2px solid var(--link); outline-offset: 3px; }
+
+  #glow {
+    position: fixed; inset: 0; width: 100vw; height: 100vh;
+    z-index: 0; pointer-events: none; image-rendering: pixelated;
+  }
+  #cv { position: relative; z-index: 1; }
+
+  .hero {
+    min-height: 100vh; box-sizing: border-box;
+    display: flex; flex-direction: column; justify-content: center; gap: 24px;
+    padding-inline: max(16px, 8vw); max-width: 60rem;
+  }
+  .hero h1 { margin: 0; font-size: clamp(38px, 6vw, 56px); line-height: 1.05; font-weight: 500; letter-spacing: -0.02em; text-wrap: balance; }
+  .hero p { margin: 0; font-size: 19px; line-height: 1.6; color: var(--muted); max-width: 36rem; }
+  .hint { font-family: var(--mono); font-size: 13px; color: var(--line); }
+
+  .block {
+    padding-inline: max(16px, 8vw); padding-block: 72px;
+    max-width: 60rem; display: grid; gap: 28px;
+  }
+  .label { font-family: var(--mono); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--link); margin: 0; }
+  .entry { display: grid; grid-template-columns: 9rem 1fr; gap: 8px 32px; padding-top: 20px; border-top: 1px solid rgba(110, 90, 142, 0.45); }
+  .entry .when { font-family: var(--mono); font-size: 13px; color: var(--line); font-variant-numeric: tabular-nums; padding-top: 4px; }
+  .entry div { min-width: 0; }
+  .entry h3 { margin: 0 0 6px; font-size: 21px; font-weight: 500; }
+  .entry p { margin: 0; color: var(--muted); line-height: 1.6; max-width: 36rem; }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tags span { font-family: var(--mono); font-size: 13px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 16px; color: var(--fg); }
+  @media (max-width: 560px) { .entry { grid-template-columns: 1fr; } }
+
+  .end { height: 100vh; position: relative; }
+  .end .eof {
+    position: absolute; left: 0; right: 0; top: 22%;
+    text-align: center; font-family: var(--mono); font-size: 13px; letter-spacing: 0.3em; color: var(--line);
+  }
+
+  /* transition layer */
+  #white {
+    position: fixed; inset: 0; z-index: 20; background: var(--paper);
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+    transform-origin: 50% 50%;
+  }
+  #eyes {
+    margin: 0; font-family: var(--mono); color: var(--ink); white-space: pre;
+    letter-spacing: 0; line-height: 1; font-weight: 500;
+  }
+  /* Bayer-dithered band along the closing edges, same pixel size as the glow */
+  #seam {
+    position: absolute; left: 0; top: 0;
+    pointer-events: none; image-rendering: pixelated;
+  }
+
+  /* the new page */
+  #after { background: var(--green); color: var(--green-fg); min-height: 100vh; }
+  #after .hero p { color: var(--green-muted); }
+  #after .label { color: #7FC69A; }
+  #after .entry { border-top-color: rgba(47, 90, 64, 0.8); }
+  #after .entry .when { color: #5E8C70; }
+  #after .entry p { color: var(--green-muted); }
+  .back {
+    min-height: 44px; padding: 0 20px; background: transparent; color: var(--green-fg);
+    border: 1px solid var(--green-line); border-radius: 22px; font-family: var(--mono); font-size: 13px; cursor: pointer; justify-self: start;
+  }
+  .back:hover { border-color: #7FC69A; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; padding-top: 8px; }
+  /* TEST ONLY: remove .dev-panel (and its script block) for the real site */
+  .dev-panel {
+    position: fixed; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 30;
+    display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 8px;
+    background: rgba(0, 0, 0, 0.72); border: 1px dashed #8a8a8a; border-radius: 8px;
+    font-family: var(--mono); font-size: 12px; color: #cfcfcf;
+  }
+  .dev-panel button {
+    min-height: 32px; padding: 0 10px; background: transparent; color: #f0f0f0;
+    border: 1px solid #8a8a8a; border-radius: 6px; font: inherit; cursor: pointer;
+  }
+  .dev-panel button:hover { border-color: #f0f0f0; }
+  body.on-green, html.on-green { background: var(--green); }
+  .shake { animation: shake 0.28s steps(2) 1; }
+  @keyframes shake {
+    0% { transform: translate(6px, -4px); } 25% { transform: translate(-5px, 3px); }
+    50% { transform: translate(3px, 2px); } 75% { transform: translate(-2px, -1px); } 100% { transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="glow" aria-hidden="true"></canvas>
+
+<div id="cv">
+  <header class="hero">
+    <h1>Lorem ipsum dolor sit amet.</h1>
+    <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+    <span class="hint">scroll to the end ↓</span>
+  </header>
+
+  <section class="block">
+    <p class="label">Experience</p>
+    <article class="entry"><span class="when">2025 – now</span><div><h3>Lorem ipsum dolor</h3><p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa quae ab illo inventore.</p></div></article>
+    <article class="entry"><span class="when">2023 – 2025</span><div><h3>Consectetur adipiscing</h3><p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.</p></div></article>
+    <article class="entry"><span class="when">2021 – 2023</span><div><h3>Tempor incididunt</h3><p>Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt.</p></div></article>
+  </section>
+
+  <section class="block">
+    <p class="label">Projects</p>
+    <article class="entry"><span class="when">2026</span><div><h3>Magna aliqua</h3><p>Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur.</p></div></article>
+    <article class="entry"><span class="when">2025</span><div><h3>Quis nostrud</h3><p>Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat.</p></div></article>
+  </section>
+
+  <section class="block">
+    <p class="label">Skills</p>
+    <div class="tags"><span>lorem</span><span>ipsum</span><span>dolor</span><span>sit amet</span><span>consectetur</span><span>adipiscing</span><span>elit</span></div>
+  </section>
+
+  <section class="end" id="end"><span class="eof">EOF</span></section>
+</div>
+
+<div class="dev-panel" id="dev-panel" aria-label="Test controls">
+  <span>test eye:</span>
+  <button type="button" data-eye="multi">multi</button>
+  <button type="button" data-eye="rings">rings</button>
+  <button type="button" data-eye="circles">circles</button>
+</div>
+
+<div id="white" hidden>
+  <pre id="eyes" aria-hidden="true"></pre>
+  <canvas id="seam" aria-hidden="true"></canvas>
+</div>
+
+<div id="after" hidden>
+  <header class="hero">
+    <h1>Nulla facilisi morbi tempus.</h1>
+    <p>Iaculis urna id volutpat lacus laoreet non curabitur gravida. Amet porttitor eget dolor morbi non arcu risus quis varius quam quisque id diam.</p>
+  </header>
+  <section class="block">
+    <p class="label">Vestibulum</p>
+    <article class="entry"><span class="when">0x01</span><div><h3>Viverra accumsan</h3><p>Mauris cursus mattis molestie a iaculis at erat pellentesque adipiscing. Commodo elit at imperdiet dui accumsan sit amet nulla facilisi.</p></div></article>
+    <article class="entry"><span class="when">0x02</span><div><h3>Faucibus pulvinar</h3><p>Egestas sed tempus urna et pharetra pharetra massa massa ultricies. Mi quis hendrerit dolor magna eget est lorem ipsum dolor.</p></div></article>
+    <article class="entry"><span class="when">0x03</span><div><h3>Elementum tempus</h3><p>Sagittis orci a scelerisque purus semper eget duis at tellus. Tincidunt dui ut ornare lectus sit amet est placerat in.</p></div></article>
+    <div class="actions">
+      <button class="back" id="replay" type="button">replay transition</button>
+      <button class="back" id="back" type="button">back to the CV</button>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = id => document.getElementById(id);
+  const cv = $('cv'), endSec = $('end'), white = $('white'), eyesEl = $('eyes'), after = $('after'), canvas = $('glow');
+  const clamp01 = x => Math.min(1, Math.max(0, x));
+  const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
+
+  // ================= horizon glow (from effects/horizon-glow.html), scroll-driven + flood =================
+  const PIX = 3, LEVELS = 7;
+  const gl = canvas.getContext('webgl', { antialias: false, premultipliedAlpha: false, preserveDrawingBuffer: true });
+  let glowDraw = () => {};
+  if (gl) {
+    const vert = 'attribute vec2 a; void main(){ gl_Position = vec4(a,0.0,1.0); }';
+    const frag = `
+      precision highp float;
+      uniform vec2 uRes, uC; uniform float uTime, uEnv, uGrow, uFlood, uW, uH, uR, uLevels; uniform vec3 uBase;
+      float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
+      float noise(vec2 p){ vec2 i=floor(p), f=fract(p); vec2 u=f*f*(3.0-2.0*f);
+        return mix(mix(hash(i),hash(i+vec2(1,0)),u.x), mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),u.x), u.y); }
+      float fbm(vec2 p){ float v=0.0,a=0.5; for(int i=0;i<4;i++){ v+=a*noise(p); p*=2.03; a*=0.5; } return v; }
+      float bayer4(vec2 p){ vec2 q=mod(floor(p),4.0); int i=int(q.x+q.y*4.0); float m[16];
+        m[0]=0.;m[1]=8.;m[2]=2.;m[3]=10.;m[4]=12.;m[5]=4.;m[6]=14.;m[7]=6.;
+        m[8]=3.;m[9]=11.;m[10]=1.;m[11]=9.;m[12]=15.;m[13]=7.;m[14]=13.;m[15]=5.;
+        for(int k=0;k<16;k++) if(k==i) return (m[k]+0.5)/16.0; return 0.5; }
+      vec3 ramp(float x){
+        vec3 c1=vec3(0.16,0.03,0.07), c2=vec3(0.50,0.20,0.30), c3=vec3(0.82,0.45,0.54), c4=vec3(0.92,0.84,0.64);
+        if(x<0.2)  return mix(uBase,c1,x/0.2);
+        if(x<0.45) return mix(c1,c2,(x-0.2)/0.25);
+        if(x<0.75) return mix(c2,c3,(x-0.45)/0.30);
+        if(x<1.0)  return mix(c3,c4,(x-0.75)/0.25);
+        return mix(c4, vec3(1.0), clamp((x-1.0)/0.45, 0.0, 1.0));   // overexposure to white
+      }
+      void main(){
+        vec2 p=(gl_FragCoord.xy-uC)/uRes.y;
+        float t=uTime, e=uEnv, F=uFlood;
+        float w=uW*mix(0.35,1.0,uGrow)*(1.0+F*F*4.0);
+        float ax=abs(p.x/w);
+        float streak=fbm(vec2(p.x*14.0,t*0.35)), fine=noise(vec2(p.x*90.0,t*1.5));
+        float I=0.0;
+        if(ax<1.25){
+          float corner=sqrt(max(0.0,1.0-pow(min(ax,1.0),5.0)));
+          if(p.y>0.0){
+            float h=uH*e*(1.0+F*F*9.0)*corner*(0.78+0.32*streak);
+            float v=p.y/max(h,1e-4);
+            I=((1.0-smoothstep(0.5,1.0,v))*0.55+exp(-v*1.4)*0.35)*(0.88+0.12*fine);
+          } else {
+            float h=uR*e*(1.0+F*F*9.0)*sqrt(max(0.0,1.0-ax*ax*0.85));
+            float v=-p.y/max(h,1e-4);
+            I=exp(-v*v*1.3)*0.6+exp(-v*1.2)*0.2;
+          }
+          I*=1.0-smoothstep(0.78,1.12,ax); I*=e;
+        }
+        I+=exp(-abs(p.y)/(0.008+0.006*e+F*0.25))*(1.0-smoothstep(0.55,1.05,ax))*0.4*e;
+        I+=exp(-abs(p.y)*uRes.y/2.5)*(1.0-smoothstep(0.7,1.35,ax))*0.9*smoothstep(0.0,0.3,e);
+        I=I*(1.0+F*1.6)+F*F*F*1.6;
+        I=clamp(I,0.0,1.45);
+        float q=floor(I*uLevels+bayer4(gl_FragCoord.xy))/uLevels;
+        gl_FragColor=vec4(ramp(clamp(q,0.0,1.45)),1.0);
+      }`;
+    const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw gl.getShaderInfoLog(s); return s; };
+    const prog = gl.createProgram();
+    gl.attachShader(prog, sh(gl.VERTEX_SHADER, vert)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, frag));
+    gl.linkProgram(prog); gl.useProgram(prog);
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(prog, 'a'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    const U = n => gl.getUniformLocation(prog, n);
+    gl.uniform1f(U('uW'), 0.85); gl.uniform1f(U('uH'), 0.32); gl.uniform1f(U('uR'), 0.15); gl.uniform1f(U('uLevels'), LEVELS);
+    gl.uniform3f(U('uBase'), 27/255, 13/255, 46/255);
+    const uRes = U('uRes'), uC = U('uC'), uTime = U('uTime'), uEnv = U('uEnv'), uGrow = U('uGrow'), uFlood = U('uFlood');
+    glowDraw = (time, env, grow, flood, horizonY) => {
+      const w = Math.max(1, Math.floor(innerWidth / PIX)), h = Math.max(1, Math.floor(innerHeight / PIX));
+      if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; gl.viewport(0, 0, w, h); }
+      gl.uniform2f(uRes, w, h);
+      gl.uniform2f(uC, w * 0.5, (innerHeight - horizonY) / PIX);
+      gl.uniform1f(uTime, time); gl.uniform1f(uEnv, env); gl.uniform1f(uGrow, grow); gl.uniform1f(uFlood, flood);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    };
+  }
+
+  // ================= the eye: one huge almond eye in ASCII blocks =================
+  const GLYPHS = [' ', '░', '▒', '▓', '█'];
+  let grid = null;
+  const seam = $('seam'), seamCtx = seam.getContext('2d');
+  function layoutEyes() {
+    const W = innerWidth, H = innerHeight;
+    const fs = Math.max(6, Math.min(10, W / 190 / 0.6));
+    const ctx = document.createElement('canvas').getContext('2d');
+    ctx.font = `500 ${fs}px 'JetBrains Mono', monospace`;
+    const cw = ctx.measureText('█'.repeat(20)).width / 20 || fs * 0.6;
+    eyesEl.style.fontSize = fs + 'px';
+    grid = { cols: Math.ceil(W / cw), rows: Math.ceil(H / fs), cw, ch: fs, W, H, S: Math.min(W * 0.3, H * 0.55) };
+  }
+  const hash = (x, y) => { const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return s - Math.floor(s); };
+  function vnoise(x, y) {
+    const ix = Math.floor(x), iy = Math.floor(y), fx = x - ix, fy = y - iy;
+    const ux = fx * fx * (3 - 2 * fx), uy = fy * fy * (3 - 2 * fy);
+    const a = hash(ix, iy), b = hash(ix + 1, iy), c = hash(ix, iy + 1), d = hash(ix + 1, iy + 1);
+    return a + (b - a) * ux + (c - a) * uy + (a - b - c + d) * ux * uy;
+  }
+
+  // bloodshot veins, rasterized once in eye space: x = lid position (-1..1), y = depth between the lids (0..1)
+  const VW = 360, VH = 140, veins = new Float32Array(VW * VH);
+  (() => {
+    let seed = 7;
+    const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+    const stamp = (x, y, w) => {
+      const cx = (x + 1) / 2 * VW, cy = y * VH, rad = Math.max(0.6, w * VW / 2);
+      for (let j = Math.floor(cy - rad * 3); j <= cy + rad * 3; j++) for (let i = Math.floor(cx - rad); i <= cx + rad; i++) {
+        if (i < 0 || j < 0 || i >= VW || j >= VH) continue;
+        const d = Math.hypot(i - cx, (j - cy) / 3);
+        if (d < rad) veins[j * VW + i] = Math.max(veins[j * VW + i], 1 - d / rad * 0.5);
+      }
+    };
+    const walk = (x, y, ang, w, depth) => {
+      for (let s = 0; s < 70 && w > 0.002; s++) {
+        stamp(x, y, w);
+        ang += (rnd() - 0.5) * 0.9;
+        x += Math.cos(ang) * 0.012; y += Math.sin(ang) * 0.03;
+        if (x < -1 || x > 1 || y < 0 || y > 1) return;
+        w *= 0.975;
+        if (depth < 3 && rnd() < 0.07) walk(x, y, ang + (rnd() < 0.5 ? 0.9 : -0.9), w * 0.7, depth + 1);
+      }
+    };
+    for (let k = 0; k < 16; k++) {
+      const side = k % 2 ? 1 : -1;
+      walk(side * (0.95 - rnd() * 0.1), 0.15 + rnd() * 0.7, side > 0 ? Math.PI + (rnd() - 0.5) : (rnd() - 0.5), 0.006 + rnd() * 0.006, 0);
+    }
+    for (let k = 0; k < 10; k++) {
+      const top = k % 2 === 0;
+      walk((rnd() - 0.5) * 1.6, top ? 0.02 : 0.98, top ? Math.PI / 2 + (rnd() - 0.5) : -Math.PI / 2 + (rnd() - 0.5), 0.004 + rnd() * 0.004, 1);
+    }
+  })();
+  const veinAt = (x, y) => {
+    const i = Math.round((x + 1) / 2 * (VW - 1)), j = Math.round(y * (VH - 1));
+    return i < 0 || j < 0 || i >= VW || j >= VH ? 0 : veins[j * VW + i];
+  };
+
+  const BT = 0.4, BB = 0.3, TILT = 0.16, R = 0.26;
+  // follow < 1 makes the satellites lag behind the main iris when it darts
+  const IRIS_SETS = {
+    multi: [
+    { x: 0, y: 0, r: R, follow: 1 },
+    { x: -0.5, y: 0.06, r: 0.1, follow: 0.6 },
+    { x: 0.46, y: -0.05, r: 0.085, follow: 0.7 },
+    { x: 0.3, y: 0.16, r: 0.055, follow: 0.5 },
+    { x: -0.3, y: -0.15, r: 0.05, follow: 0.8 },
+    ],
+    // one wide iris with concentric rings, all one tone, small pupil
+    rings: [{ x: 0, y: 0, r: 0.3, follow: 1, rings: [0.36, 0.6, 0.83] }],
+    // no iris at all: bare circles drawn straight on the white of the eye, spreading past the lids
+    circles: [{ x: 0, y: 0, r: 0.62, follow: 1, bare: [0.07, 0.15, 0.24, 0.34, 0.45, 0.57] }],
+  };
+  let IRISES = IRIS_SETS.multi;
+  const lidTop = (lx, o) => { const s = 1 - lx * lx; return s <= 0 ? 0 : -BT * o * Math.pow(s, 0.85) * (1 - 0.18 * lx); };
+  const lidBot = (lx, o) => { const s = 1 - lx * lx; return s <= 0 ? 0 : BB * o * Math.pow(s, 1.15) * (1 + 0.15 * lx); };
+
+  // darkness 0..1 at normalized point (u,v); screen y points down
+  function eyeField(u, v, st) {
+    const lx = u, ly = v + u * TILT;          // outer (right) corner raised
+    const o = st.open;
+    const s = Math.max(0, 1 - lx * lx);
+    const ap = st.appear;                      // the lid line grows out from the centre as the eye appears
+    const taper = Math.pow(s, 0.35) * Math.pow(Math.max(0, 1 - (lx / Math.max(ap, 1e-3)) ** 2), 0.35);
+    let I = 0;
+
+    if (Math.abs(lx) < ap) {
+      const top = lidTop(lx, o), bot = lidBot(lx, o);
+      const tU = (0.05 + 0.03 * (1 - o)) * taper, tL = (0.028 + 0.02 * (1 - o)) * taper;
+
+      if (Math.abs(ly - top) < tU) return 1;
+      if (Math.abs(ly - bot) < tL) return 0.92;
+
+      if (ly > top && ly < bot) {
+        // one main iris plus smaller satellite irises, all the same flat tone, each with a small cat pupil
+        const shadeLid = Math.max(Math.exp(-(ly - top) / 0.06) * 0.95, Math.exp(-(bot - ly) / 0.04) * 0.5);
+        let r = 1e9;
+        for (const ir of IRISES) {
+          const cx = st.gx * ir.follow + ir.x, cy = st.gy * ir.follow + ir.y;
+          const dx = u - cx, dy = v - cy, rr = Math.hypot(dx, dy);
+          if (ir.bare) {
+            if (rr >= ir.r) continue;
+            const breathe = 0.94 + 0.06 * Math.min(1.5, st.slit);
+            const pw = 0.004 + 0.012 * st.slit, ph = 0.05;
+            if (Math.abs(dy) < ph && Math.abs(dx) < pw * Math.pow(1 - (dy / ph) ** 2, 0.7)) return 1;
+            for (const f of ir.bare) if (Math.abs(rr - f * breathe) < 0.011) return Math.max(1, shadeLid);
+            continue;                                            // between the circles: plain sclera
+          }
+          r = Math.min(r, rr - ir.r + R);
+          if (rr >= ir.r) continue;
+          const k = ir.r / R;                                    // scale pupil and highlight to the iris
+          const small = ir.rings ? 0.6 : 1;
+          const pw = (0.006 + 0.022 * st.slit) * k * small, ph = 0.11 * k * small;
+          if (Math.abs(dy) < ph && Math.abs(dx) < pw * Math.pow(1 - (dy / ph) ** 2, 0.7)) I = 1;
+          else if (Math.hypot(dx + 0.07 * k, dy + 0.075 * k) < 0.022 * k) I = 0;
+          else if (rr > ir.r - 0.022) I = 1;
+          else {
+            I = 0.5;
+            if (ir.rings) {
+              const breathe = 0.94 + 0.06 * Math.min(1.5, st.slit);     // rings tighten with the pupil
+              for (const f of ir.rings) if (Math.abs(rr - f * ir.r * breathe) < 0.011) { I = 1; break; }
+            }
+          }
+          return Math.min(1, Math.max(I, shadeLid));
+        }
+        // sclera: shading under the lids, darker toward the corners, veins, a halo around the iris
+        const depth = (ly - top) / Math.max(1e-4, bot - top);
+        I = Math.max(
+          Math.exp(-(ly - top) / 0.07) * 0.8,
+          Math.exp(-(bot - ly) / 0.045) * 0.4,
+          Math.pow(Math.abs(lx), 5) * 0.7,
+          veinAt(lx, depth) * 0.85,
+          r < R + 0.035 ? 0.3 : 0
+        );
+        return I;
+      }
+
+      if (ly < top) {                            // upper lid flesh: folds and clumped lashes
+        const d = top - ly;
+        for (let k = 1; k <= 3; k++) {
+          const off = (0.06 + 0.075 * k) * Math.pow(s, 0.55) * (1 + 0.25 * (vnoise(lx * 4 + k * 7, 1) - 0.5));
+          if (Math.abs(d - off) < (0.016 - 0.003 * k) * taper) I = Math.max(I, 1.05 - 0.2 * k);
+        }
+        if (Math.abs(lx) < 0.9) {
+          const len = 0.03 + 0.1 * vnoise(lx * 6, 3.3) * s;
+          const ph = ((lx * 13 + d * 7 * (0.6 + lx)) % 1 + 1) % 1;
+          if (d < len && ph < 0.14 + 0.2 * (1 - d / len)) I = 1;
+        }
+      } else {                                   // lower lid flesh: bags
+        const d = ly - bot;
+        for (let k = 1; k <= 2; k++) {
+          const off = (0.05 + 0.07 * k) * Math.pow(s, 0.7);
+          if (Math.abs(d - off) < 0.012 * taper) I = Math.max(I, 0.85 - 0.2 * k);
+        }
+      }
+    }
+
+    // surrounding flesh: wrinkles and grit fading out from the eye
+    const e = Math.hypot(lx / 1.3, ly / 0.8);
+    if (e < 1.15) {
+      const fade = smooth(1.1, 0.6, e) * ap * ap;
+      const w = vnoise(lx * 5, ly * 14 + 2 * vnoise(lx * 2, ly * 2));
+      if (Math.abs((w * 6) % 1 - 0.5) < 0.05) I = Math.max(I, 0.55 * fade);
+      if (hash(u * 211.3, v * 173.9) < 0.14 * fade) I = Math.max(I, 0.3);
+    }
+    return I;
+  }
+
+  function renderEyes(st) {
+    const { cols, rows, cw, ch, W, H, S } = grid;
+    const jx = st.jitter ? (Math.random() - 0.5) * st.jitter : 0, jy = st.jitter ? (Math.random() - 0.5) * st.jitter : 0;
+    let out = '';
+    for (let y = 0; y < rows; y++) {
+      let line = '';
+      for (let x = 0; x < cols; x++) {
+        let acc = 0;
+        for (let sy = 0; sy < 2; sy++) for (let sx = 0; sx < 2; sx++) {
+          acc += eyeField(((x + 0.25 + sx * 0.5) * cw - W / 2) / S + jx, ((y + 0.25 + sy * 0.5) * ch - H / 2) / S + jy, st);
+        }
+        const g = acc / 4;
+        line += g < 0.04 ? ' ' : GLYPHS[Math.min(4, Math.max(1, Math.round(g * 4 + (hash(x, y) - 0.5) * 0.6)))];
+      }
+      out += line + '\n';
+    }
+    eyesEl.textContent = out;
+  }
+
+  // ================= sequence =================
+  const easeIn = x => x * x * x, easeOut = x => 1 - (1 - x) ** 3;
+  let state = 'scroll', seqStart = 0, atBottomSince = 0, userScrolled = false;
+  const T = { flood: 1900, whiteHold: 700, crack: 300, crackHold: 340, open: 220, settle: 160, stare: 1450, snap: 60, closedHold: 150, collapse: 220 };
+
+  function eyeTimeline(ms) {           // ms since white is full; returns the eye state, or 'collapse' when done
+    let t = ms - T.whiteHold;
+    const st = { open: 0, gx: 0, gy: 0.02, slit: 1, jitter: 0, appear: 1 - (1 - clamp01((ms - 80) / 650)) ** 2 };
+    if (t < 0) return st;
+    if (t < T.crack) { st.open = 0.16 * easeOut(t / T.crack); return st; }
+    t -= T.crack;
+    if (t < T.crackHold) {                                             // peeking through a slit, twitching
+      st.open = 0.16 + 0.03 * Math.sin(t * 0.08) + (t > 230 && t < 270 ? -0.1 : 0);
+      st.gx = -0.3; st.jitter = 0.006; return st;
+    }
+    t -= T.crackHold;
+    if (t < T.open) { st.open = 0.16 + 0.94 * easeOut(t / T.open); st.gx = -0.3 * (1 - t / T.open); return st; }
+    t -= T.open;
+    if (t < T.settle) { st.open = 1.1 - 0.1 * easeOut(t / T.settle); return st; }
+    t -= T.settle;
+    if (t < T.stare) {
+      st.open = 1; st.jitter = 0.004;
+      st.gx = t < 240 ? 0.26 : t < 520 ? -0.22 : t < 640 ? 0.08 : 0;  // darts around, then locks onto the viewer
+      st.gy = t < 240 ? -0.04 : t < 520 ? 0.05 : 0.02;
+      st.slit = t < 1100 ? 1 - 0.8 * smooth(600, 1050, t) : 0.2 + 2.3 * smooth(1100, 1180, t);   // narrows, then blows wide
+      if (t > 1100) st.open = 1 + 0.08 * smooth(1100, 1180, t);
+      return st;
+    }
+    t -= T.stare;
+    if (t < T.snap) { st.open = 1.08 * (1 - easeIn(t / T.snap)); st.slit = 2.5; return st; }
+    t -= T.snap;
+    if (t < T.closedHold) return st;
+    return 'collapse';
+  }
+
+  function horizonY() {
+    const r = endSec.getBoundingClientRect();
+    return r.top + r.height * 0.6;
+  }
+  function scrollProgress() {
+    const r = endSec.getBoundingClientRect();
+    return clamp01(1 - r.top / innerHeight);
+  }
+  function atBottom() {
+    return innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
+  }
+
+  let forcedEye = null;
+  // the white shuts toward the eye line; clip and dither share one pixel grid (PIX, like the glow) so they stay in sync
+  const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+  const SEAM_INK = [null, [150, 150, 150], [70, 70, 70], [18, 18, 18]];   // light grey, grey, near-black
+  function renderSeam(k, now) {
+    const w = Math.ceil(innerWidth / PIX), h = Math.ceil(innerHeight / PIX);
+    if (seam.width !== w || seam.height !== h) {
+      seam.width = w; seam.height = h;
+      seam.style.width = w * PIX + 'px'; seam.style.height = h * PIX + 'px';   // exact PIX scale so it lines up with the clip
+    }
+    const hsh = (x, y) => (((x * 73856093) ^ (y * 19349663)) >>> 0) % 1000 / 1000;
+    const flick = Math.floor(now / 60);
+    const B = 9, mid = h / 2, half = (1 - easeIn(k)) * (mid + 4);
+    const top = new Int32Array(w), bot = new Int32Array(w);
+    for (let x = 0; x < w; x++) {
+      const blk = x >> 2;                                    // ragged in 4-pixel steps
+      top[x] = Math.round(mid - half + (hsh(blk, 3) - 0.5) * 5 + (hsh(blk, flick) - 0.5) * 2);
+      bot[x] = Math.max(top[x], Math.round(mid + half + (hsh(blk, 9) - 0.5) * 5 + (hsh(blk, flick + 77) - 0.5) * 2));
+    }
+    const pts = [];
+    for (let x = 0; x < w; x++) pts.push(`${x * PIX}px ${top[x] * PIX}px`, `${(x + 1) * PIX}px ${top[x] * PIX}px`);
+    for (let x = w - 1; x >= 0; x--) pts.push(`${(x + 1) * PIX}px ${bot[x] * PIX}px`, `${x * PIX}px ${bot[x] * PIX}px`);
+    white.style.clipPath = `polygon(${pts.join(',')})`;
+
+    const img = seamCtx.createImageData(w, h), d = img.data;
+    for (let x = 0; x < w; x++) {
+      for (let y = Math.max(0, top[x]); y < Math.min(h, bot[x]); y++) {
+        const sd = Math.min(y - top[x], bot[x] - 1 - y);   // pixels inward from the nearest edge
+        if (sd >= B) continue;
+        const D = 0.65 * Math.pow(1 - sd / B, 1.6);
+        const lvl = Math.min(3, Math.floor(D * 3 + (BAYER[(y & 3) * 4 + (x & 3)] + 0.5) / 16));
+        if (!lvl) continue;
+        const c = SEAM_INK[lvl], i = (y * w + x) * 4;
+        d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2]; d[i + 3] = 255;
+      }
+    }
+    seamCtx.putImageData(img, 0, 0);
+  }
+
+  function pickVariant() {
+    const h = location.hash;
+    const forced = forcedEye || { '#rings': 'rings', '#multi': 'multi', '#circles': 'circles' }[h];
+    forcedEye = null;
+    const names = Object.keys(IRIS_SETS);
+    IRISES = IRIS_SETS[forced || names[Math.floor(Math.random() * names.length)]];   // one in three each run
+  }
+  function startSequence(now) {
+    pickVariant();
+    state = reduced ? 'reduced' : 'flood';
+    seqStart = now;
+    document.documentElement.style.overflow = 'hidden';
+    canvas.style.zIndex = 15;
+  }
+
+  function showAfter() {
+    cv.hidden = true; canvas.hidden = true;
+    after.hidden = false;
+    document.documentElement.classList.add('on-green'); document.body.classList.add('on-green');
+    document.documentElement.style.overflow = '';
+    scrollTo(0, 0);
+  }
+
+  function frame(now) {
+    const time = now / 1000;
+    const idle = state === 'scroll' || state === 'done';
+    if (devPanel.hidden === idle) devPanel.hidden = !idle;
+    if (state === 'scroll') {
+      const p = scrollProgress();
+      if (p > 0 && !canvas.hidden) {
+        const e = smooth(0.25, 0.95, p);
+        const flick = p > 0.97 ? 0.93 + 0.07 * Math.sin(time * 23) * Math.sin(time * 7.3) : 1;
+        glowDraw(time, e * flick, smooth(0.35, 1, p), 0, horizonY());
+      } else glowDraw(time, 0, 0, 0, horizonY());
+      if (userScrolled && atBottom()) {
+        if (!atBottomSince) atBottomSince = now;
+        if (now - atBottomSince > 450) startSequence(now);
+      } else atBottomSince = 0;
+    } else if (state === 'flood') {
+      const k = clamp01((now - seqStart) / T.flood);
+      const F = easeIn(k);
+      glowDraw(time, 1, 1, F, horizonY());
+      const amp = 7 * k * k;
+      canvas.style.transform = `translate(${(Math.random() - 0.5) * amp}px, ${(Math.random() - 0.5) * amp}px)`;
+      if (k >= 1) {
+        canvas.style.transform = '';
+        layoutEyes();
+        white.hidden = false;
+        eyesEl.textContent = '';
+        state = 'eyes'; seqStart = now;
+      }
+    } else if (state === 'eyes') {
+      const st = eyeTimeline(now - seqStart);
+      if (st === 'collapse') {
+        showAfter();
+        state = 'collapse'; seqStart = now;
+      } else renderEyes(st);
+    } else if (state === 'collapse') {
+      const k = clamp01((now - seqStart) / T.collapse);
+      renderSeam(k, now);
+      if (k >= 1) {
+        white.hidden = true; white.style.clipPath = '';
+        seamCtx.clearRect(0, 0, seam.width, seam.height);
+        after.classList.remove('shake'); void after.offsetWidth; after.classList.add('shake');
+        state = 'done';
+      }
+    } else if (state === 'reduced') {
+      white.hidden = false; eyesEl.textContent = '';
+      white.style.transition = 'opacity 0.4s'; white.style.opacity = '1';
+      if (now - seqStart > 500) { showAfter(); white.hidden = true; state = 'done'; }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  addEventListener('scroll', () => { userScrolled = true; }, { passive: true });
+  addEventListener('wheel', () => { userScrolled = true; }, { passive: true });
+  addEventListener('touchmove', () => { userScrolled = true; }, { passive: true });
+  addEventListener('resize', () => { if (state === 'eyes') layoutEyes(); });
+
+  function backToCV() {
+    after.hidden = true; after.classList.remove('shake');
+    cv.hidden = false; canvas.hidden = false; canvas.style.zIndex = '';
+    document.documentElement.classList.remove('on-green'); document.body.classList.remove('on-green');
+    state = 'scroll'; atBottomSince = 0; userScrolled = false;
+  }
+  $('back').addEventListener('click', () => { backToCV(); scrollTo(0, 0); });
+  function replayNow() {
+    backToCV();
+    scrollTo(0, document.documentElement.scrollHeight);
+    requestAnimationFrame(now => startSequence(now));
+  }
+  $('replay').addEventListener('click', replayNow);
+
+  // TEST ONLY: run the transition with a chosen eye
+  const devPanel = $('dev-panel');
+  devPanel.addEventListener('click', e => {
+    const b = e.target.closest('button[data-eye]');
+    if (!b || !(state === 'scroll' || state === 'done')) return;
+    forcedEye = b.dataset.eye;
+    replayNow();
+  });
+
+  // #eyes, #rings, #multi or #circles in the link jump straight to the end; the last three force that eye
+  if (['#eyes', '#rings', '#multi', '#circles'].includes(location.hash)) { userScrolled = true; setTimeout(() => scrollTo(0, document.documentElement.scrollHeight), 50); }
+
+  (document.fonts ? document.fonts.load("500 14px 'JetBrains Mono'").catch(() => {}) : Promise.resolve())
+    .then(() => requestAnimationFrame(frame));
+})();
+</script>
+</body>
+</html>
