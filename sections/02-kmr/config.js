@@ -19,7 +19,7 @@ export default {
     '--a-dark': '#4b4e58',
     '--a-glint': '#fffbea',
   },
-  sectionHeight: '72vh',   // height of each sub-section: lower = less black between them (phones: full screen)
+  sectionHeight: '72vh',   // height of each sub-section: lower = less black between them (phones: full screen); vh: the stable screen height of core/viewport.js
 
   // ---------- ASCII swimmer sub-sections (KM-RoBoTa, AI Summit) ----------
   swimmer: {

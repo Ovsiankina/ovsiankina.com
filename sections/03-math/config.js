@@ -58,7 +58,7 @@ export default {
   // black with the first dots of the Lagrangian's paper rising from below, along a sine; the transition fires once
   // it is fully on screen. Only the tail of the black -> paper ramp is ever shown: it never becomes a paper band.
   leadIn: {
-    height: '30vh',            // height of the block: at the trigger the section above keeps the rest of the screen
+    height: '30vh',            // height of the block: at the trigger the section above keeps the rest of the screen (vh: stable, core/viewport.js)
     dwell: 0,                  // ms the page stops flush at the end of the block before the transition (0 = none)
     black: '#000',             // its own black: pure, so it meets a pure black section above without a step
     from: 1.3,                 // centre of the black -> paper ramp before it grows, fraction of the height (below the

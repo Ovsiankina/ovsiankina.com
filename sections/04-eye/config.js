@@ -14,7 +14,7 @@ export default {
   leadIn: {
     bg: '#1B0D2E',     // the original site purple, also the glow's base colour
     dwell: 450,        // ms resting flush at its end, glow flickering, before the flood (the original's wait at the bottom)
-    folded: '18vh',    // its height once the transition has played: a short purple break, no glow (CSS length)
+    folded: '18vh',    // its height once the transition has played: a short purple break, no glow (vh: the stable screen height of core/viewport.js)
   },
 
   // ---------- RISE (shell / goTo only): the horizon glow grows out of whatever page was on screen ----------

@@ -25,6 +25,7 @@
 //                    layer: empty fixed full-screen box above the ghost for the transition's own drawing
 //                    root/section: the target, already parked at the top of the screen underneath
 //                    via: 'scroll' | 'jump'
+import './viewport.js';                       // --sh first: every section's style sizes itself with it
 import list from '../sections/sections.js';
 import { createNavigator } from './navigator.js';
 import { createShell } from './shell.js';

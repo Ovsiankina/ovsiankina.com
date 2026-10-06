@@ -12,7 +12,7 @@
   padding-bottom: var(--bottom-gap, 0px);
 }
 
-.s-landing .hero { position: relative; height: 100vh; height: 100svh; min-height: 560px; overflow: hidden; }
+.s-landing .hero { position: relative; height: calc(100 * var(--sh)); min-height: 560px; overflow: hidden; }
 .s-landing .hero canvas { position: absolute; left: 0; top: 0; image-rendering: pixelated; pointer-events: none; }
 .s-landing .geo { z-index: 3; }
 .s-landing .more { z-index: 3; }
@@ -124,7 +124,7 @@
 .s-landing .cv.sheet { display: none; }
 .s-landing.port .cv.sheet {
   display: block; position: relative; z-index: 1; overflow: visible; overscroll-behavior: auto;
-  min-height: 100svh; padding: 40px var(--side) 72px; background: var(--bg);
+  min-height: calc(100 * var(--sh)); padding: 40px var(--side) 72px; background: var(--bg);
 }
 .s-landing .sheet .cols { grid-template-columns: minmax(0, 1fr); gap: 1.5em; }
 .s-landing .sheet::before {

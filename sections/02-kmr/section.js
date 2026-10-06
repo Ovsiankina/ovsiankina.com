@@ -7,6 +7,7 @@ import content from './content.js';
 import config from './config.js';
 import { swimmer } from './swimmer.js';
 import { xiao } from './xiao.js';
+import { sh } from '../../core/viewport.js';
 
 export const id = 'kmr';
 export const title = 'KM-RoBoTa';
@@ -67,7 +68,7 @@ function xiaoBlock(c) {
 
 export async function mount(root, env) {
   for (const [k, v] of Object.entries(config.colors)) root.style.setProperty(k, v);
-  root.style.setProperty('--section-h', config.sectionHeight);
+  root.style.setProperty('--section-h', sh(config.sectionHeight));
   root.innerHTML = swimmerBlock('ax-kmr', 'left', content.kmr)
                  + swimmerBlock('ax-summit', 'right', content.summit)
                  + xiaoBlock(content.xiao);

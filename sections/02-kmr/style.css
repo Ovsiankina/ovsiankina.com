@@ -109,7 +109,7 @@
 @media (max-width: 760px) {
   .s-kmr .ax .copy { position: absolute; top: 48px; left: 20px; right: 20px; margin: 0 !important; width: auto; }
   .s-kmr .ax p { font-size: 13.5px; }
-  .s-kmr .ax { height: 100svh; }                     /* phones: copy on top needs the full screen */
+  .s-kmr .ax { height: calc(100 * var(--sh)); }                     /* phones: copy on top needs the full screen */
   .s-kmr .xiao { display: block; height: auto; min-height: 0; padding: 48px 20px 40px; }
   .s-kmr .xiao .copy { position: relative; top: 0; left: 0 !important; right: 0 !important; }
   .s-kmr .xiao .viewer { position: relative; right: auto; top: auto; transform: none; width: 100%; margin-top: 28px; }

@@ -14,7 +14,7 @@
 /* ---------- maths section ---------- */
 /* no position here: the core positions the root (relative in the page, absolute in its frozen copy) */
 .section.s-math {
-  min-height: 100vh; min-height: 100svh; overflow: hidden;
+  min-height: calc(100 * var(--sh)); overflow: hidden;
   background: var(--bg); color: var(--text); font-family: var(--mono);
 }
 .s-math canvas.trace { position: absolute; left: 0; top: 0; image-rendering: pixelated; pointer-events: none; }
@@ -38,7 +38,7 @@
 .s-math.port .copy { position: relative; left: auto; top: auto; transform: none; width: auto; max-width: 60ch; padding: 68px 16px 0; }
 .s-math.port .zlabel { font-size: 11px; }
 .s-math.port .copy h2 { font-size: 26px; }
-.s-math.port .stage { position: relative; left: auto; height: 62svh; min-height: 340px; }
+.s-math.port .stage { position: relative; left: auto; height: calc(62 * var(--sh)); min-height: 340px; }
 
 /* ---------- lead-in: the approach block just above the section (leadin.js) ---------- */
 .s-math-leadin { height: var(--leadin-h); overflow: hidden; background: var(--leadin-black); }

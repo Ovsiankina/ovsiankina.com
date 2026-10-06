@@ -49,7 +49,7 @@ export default {
   // below the scene: the cream wall glitching out into the site's dark background (tail.js), the page can be scrolled into it.
   // Lengths in drawn pixels (PIX grid) unless noted.
   tail: {
-    height: 38,     // vh
+    height: 38,     // % of the stable screen height (core/viewport.js)
     dark: '#070707',// the site's background, what it fades into
     line: 0.5,      // where the 50 % line sits, fraction of the tail's height
     soft: 0.55,     // length of the cream -> dark ramp, fraction of the height

@@ -12,7 +12,7 @@
   --pixel: 'Silkscreen', 'IBM Plex Mono', ui-monospace, monospace;
   --mono: 'JetBrains Mono', ui-monospace, monospace;
   color-scheme: dark;
-  height: 100vh; height: 100dvh; overflow: hidden;
+  height: calc(100 * var(--sh)); overflow: hidden;
   background: var(--night); color: var(--ink);
 }
 .s-eye .swirl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: pointer; }
@@ -73,6 +73,6 @@
 
 /* the lead-in: the original's end screen, the horizon glow growing in it (colours from config.leadIn);
    once the transition has played it folds into a short purple break, glow gone */
-.s-eye-leadin { height: 100vh; overflow: hidden; background: var(--leadin-bg); }
+.s-eye-leadin { height: calc(100 * var(--sh)); overflow: hidden; background: var(--leadin-bg); }
 .s-eye-leadin.folded { height: var(--leadin-folded); }
 .s-eye-leadin .glow { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; pointer-events: none; }

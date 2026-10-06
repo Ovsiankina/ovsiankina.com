@@ -2,6 +2,10 @@
    Each section styles itself under its own root class (.s-<id>); nothing here is section specific. */
 * { box-sizing: border-box; }
 html, body { margin: 0; background: #070707; }
+html { scrollbar-gutter: stable; }   /* the scrollbar's room stays when the lock hides it: nothing reflows */
+/* while a transition plays (core/navigator.js): the page cannot be scrolled at all, not even by a finger
+   already dragging or a fling already running; no bounce, no pull-to-refresh */
+html.locked { overflow: hidden; overscroll-behavior: none; }
 [hidden] { display: none !important; }
 
 #site { position: relative; }
@@ -22,6 +26,7 @@ html, body { margin: 0; background: #070707; }
 /* transition layers: the frozen copy of the screen, then the transition's own drawing on top */
 .freeze, .tx-layer {
   position: fixed; inset: 0; overflow: hidden; pointer-events: none;
+  touch-action: none;   /* a new touch on the cover never pans: decided at touch-down, without waiting on JS */
 }
 .freeze { z-index: 900; pointer-events: auto; }   /* swallows clicks meant for the live page underneath */
 .tx-layer { z-index: 910; }

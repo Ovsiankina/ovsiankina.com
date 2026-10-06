@@ -14,7 +14,7 @@ export const edges = { top: config.paper, bottom: config.tail.dark };
 export async function mount(root, env) {
   root.style.setProperty('--climb-paper', config.paper);
   root.style.setProperty('--climb-ink', config.ink);
-  root.style.setProperty('--climb-tail', config.tail.height + 'vh');
+  root.style.setProperty('--climb-tail', `calc(${config.tail.height} * var(--sh))`);
   root.innerHTML = `
 <div class="stage">
   <canvas class="holds" aria-hidden="true"></canvas>

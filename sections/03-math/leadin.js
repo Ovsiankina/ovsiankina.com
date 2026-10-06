@@ -5,6 +5,7 @@
 // own (stepped wave, torn bands, coarse blocks) while it is on screen.
 import config from './config.js';
 import { BAYER, pack, clamp01, cssRgb } from './pixels.js';
+import { sh } from '../../core/viewport.js';
 
 const P = config.pixel;
 const LI = config.leadIn;
@@ -12,7 +13,7 @@ const hsh = (x, y, z) => (((x * 73856093) ^ (y * 19349663) ^ (z * 83492791)) >>>
 
 export function mountLeadIn(el, env) {
   for (const [k, v] of Object.entries(config.palette)) el.style.setProperty('--' + k, v);
-  el.style.setProperty('--leadin-h', LI.height);
+  el.style.setProperty('--leadin-h', sh(LI.height));
   el.setAttribute('aria-hidden', 'true');
   el.innerHTML = '<canvas></canvas>';
   const cv = el.querySelector('canvas'), ctx = cv.getContext('2d');

@@ -7,6 +7,7 @@ import { zeta } from './zeta.js';
 import { BAYER, pack, cssRgb } from './pixels.js';
 import { mountLeadIn } from './leadin.js';
 import { replayButton } from '../../core/replay.js';
+import { screenH, onScreen } from '../../core/viewport.js';
 
 export const id = 'math';
 export const title = content.heading;
@@ -98,9 +99,9 @@ export async function mount(root, env) {
 
   function zLayout() {
     const W = root.clientWidth;
-    const port = !(W >= config.landscape.minWidth && window.innerWidth / window.innerHeight >= config.landscape.minAspect);
+    const port = !(W >= config.landscape.minWidth && window.innerWidth / screenH() >= config.landscape.minAspect);
     root.classList.toggle('port', port);
-    const H = Math.max(window.innerHeight, port ? copyEl.offsetHeight + stageEl.offsetHeight : 0);
+    const H = Math.max(screenH(), port ? copyEl.offsetHeight + stageEl.offsetHeight : 0);
     root.style.height = H + 'px';
     Z.GW = Math.ceil(W / P); Z.GH = Math.ceil(H / P);
     zc.width = Z.GW; zc.height = Z.GH; zc.style.width = Z.GW * P + 'px'; zc.style.height = Z.GH * P + 'px';
@@ -297,7 +298,7 @@ export async function mount(root, env) {
   }, { rootMargin: '-1px 0px' });
   io.observe(root);
 
-  let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { zLayout(); zRender(); }, 120); });
+  onScreen(() => { zLayout(); zRender(); });   // not on a toolbar slide: that would restart the trace mid-scroll
 
   zLayout(); zRender();
   // the portrait layout depends on the copy's height, which depends on the fonts

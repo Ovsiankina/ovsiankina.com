@@ -8,6 +8,7 @@ import c from './content.js';
 import config from './config.js';
 import { createGlow, rgb01 } from './glow.js';
 import { createSwirl } from './swirl.js';
+import { sh } from '../../core/viewport.js';
 import { replayButton } from '../../core/replay.js';
 
 export const id = 'eye';
@@ -22,7 +23,7 @@ export const leadIn = {
   dwell: config.leadIn.dwell,
   mount(el) {
     el.style.setProperty('--leadin-bg', config.leadIn.bg);
-    el.style.setProperty('--leadin-folded', config.leadIn.folded);
+    el.style.setProperty('--leadin-folded', sh(config.leadIn.folded));
     let glow = null, io = null, raf = 0, visible = false;
 
     // core calls it once the transition has run, just before parking the page on the swirl section

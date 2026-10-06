@@ -5,6 +5,7 @@ import config from './config.js';
 import { BAYER, pack, rgb } from '../../core/dither.js';
 import { replayButton } from '../../core/replay.js';
 import { swipeHint } from './swipe-hint.js';
+import { screenH, onScreen, sh } from '../../core/viewport.js';
 
 export const id = 'landing';
 export const title = 'Landing';
@@ -80,7 +81,7 @@ export async function mount(root, env) {
   const EASE = bezier(...config.EASE);
 
   for (const [k, v] of Object.entries(config.palette)) root.style.setProperty('--' + k, v);
-  root.style.setProperty('--bottom-gap', config.BOTTOM_GAP * 100 + 'vh');
+  root.style.setProperty('--bottom-gap', sh(config.BOTTOM_GAP * 100 + 'vh'));
   root.setAttribute('aria-label', content.label);
   root.innerHTML = markup(content);
 
@@ -153,9 +154,9 @@ export async function mount(root, env) {
 
   function layout() {
     const W = hero.clientWidth;
-    let H = window.innerHeight;
+    let H = screenH();
     const port = !(W / H >= 1.2 && W >= 760);
-    // portrait: the hero is exactly one screen (100svh in CSS, so the phone's URL bar never resizes it)
+    // portrait: the hero is exactly one screen (--sh in CSS, so the phone's toolbars never resize it)
     if (port) H = hero.clientHeight;
     const pad = Math.max(16, Math.round(Math.min(W, H) * 0.04));
     let x0, y0, Wr, Hr, d0;
@@ -612,11 +613,9 @@ export async function mount(root, env) {
     } catch (err) { /* declined or unavailable: nothing to do */ }
   });
 
-  let rz; addEventListener('resize', () => {
-    clearTimeout(rz); rz = setTimeout(() => {
-      layout();
-      if (introDone || !running) drawGeo(...geoAt);   // mid-intro, the running loop redraws on its own
-    }, 120);
+  onScreen(() => {
+    layout();
+    if (introDone || !running) drawGeo(...geoAt);   // mid-intro, the running loop redraws on its own
   });
 
   // -1px: a section merely touching the screen edge (parked right above the current one) counts as off screen
