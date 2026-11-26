@@ -7,6 +7,24 @@
     "My dream is not only to use it. One day I would like to <em>move a real open question forward</em>, even by a small step."
   ],
   "caption": "ζ(½ + it) ON THE CRITICAL LINE. EVERY PASS THROUGH THE ORIGIN IS A NON-TRIVIAL ZERO. THE RIEMANN HYPOTHESIS STATES THAT THEY ALL LIE THERE.",
+  "captionWave": "|ψ(x₁, x₂)|² FOR TWO IDENTICAL PARTICLES CROSSING ON A LINE. BOSONS PILE UP WHERE x₁ = x₂. FERMIONS NEVER MEET THERE: THE PAULI EXCLUSION PRINCIPLE.",
+  "peakLabel": "|ψ(x₁, x₂)|²",
+  "sepLabel": "Δx = {{d}}",
+  "axes": ["x₁", "x₂"],
+  "controls": {
+    "viewLabel": "Figure",
+    "wave": "WAVE FUNCTION",
+    "riemann": "RIEMANN",
+    "kindLabel": "Particles",
+    "bosons": "BOSONS",
+    "fermions": "FERMIONS",
+    "dimLabel": "View",
+    "3d": "3D",
+    "2d": "2D",
+    "hint3d": "DRAG TO TURN, UP TO FLATTEN",
+    "hint2d": "DRAG TO TURN, DOWN FOR 3D",
+    "hintTouch": "DRAG TO TURN"
+  },
   "replay": "REPLAY",
   "transitionCaption": "STANDARD MODEL LAGRANGIAN",
   "tuning": {

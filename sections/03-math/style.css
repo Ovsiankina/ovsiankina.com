@@ -35,7 +35,35 @@
   font: 400 13px/1 var(--mono); color: var(--ink); font-variant-numeric: tabular-nums;
 }
 
+/* ---------- the two figures: only the one named by data-view on the root shows ---------- */
+.s-math[data-view="wave"] canvas.trace, .s-math[data-view="wave"] .zlabel { visibility: hidden; }
+.s-math[data-view="riemann"] .stage > *, .s-math[data-view="riemann"] .wave-only { display: none; }
+.s-math[data-view="wave"] .stage { cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.s-math[data-view="wave"] .stage.drag { cursor: grabbing; }
+.s-math canvas.wave { position: absolute; left: 0; top: 0; image-rendering: pixelated; pointer-events: none; }
+.s-math .wlabel {
+  position: absolute; left: 0; top: 0; pointer-events: none; white-space: nowrap; opacity: 0;
+  font: 400 13px/1 var(--mono); color: var(--ink); font-variant-numeric: tabular-nums;
+}
+.s-math .wlabel.ax1, .s-math .wlabel.ax2 { color: var(--geo); }
+
+/* the switches under the figure: the top bar's EN / FR (core/base.css), lit in the trace's yellow.
+   No font on .controls itself: its left edge is the stage's, which counts in the section's ch */
+.s-math .controls {
+  position: absolute; z-index: 4; bottom: 14px; right: 110px;   /* the replay button keeps the corner */
+  left: calc(max(16px, 6vw) + min(34ch, 34vw) + 4vw + 16px);
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px;
+}
+.s-math .seg { display: flex; border: 1px solid var(--line); background: var(--bg); }
+.s-math .seg button, .s-math .controls .hint { font: 9px/1 var(--pixel); letter-spacing: .1em; color: var(--dim); }
+.s-math .seg button { padding: 7px 10px; border: 0; background: none; cursor: pointer; white-space: nowrap; }
+.s-math .seg button:hover, .s-math .seg button:focus-visible { color: var(--ink); outline: none; }
+.s-math .seg button[aria-pressed="true"] { background: var(--yellow); color: var(--bg); cursor: default; }
+.s-math .controls .hint { color: var(--geo); opacity: .75; }
+
 /* portrait: copy in flow on top, trace below */
+.s-math.port .controls { left: 16px; }
+.s-math.port .wlabel { font-size: 11px; }
 .s-math.port .copy { position: relative; left: auto; top: auto; transform: none; width: auto; max-width: 60ch; padding: 68px 16px 0; }
 .s-math.port .zlabel { font-size: 11px; }
 .s-math.port .copy h2 { font-size: 26px; }

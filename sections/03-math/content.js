@@ -3,7 +3,10 @@
 // in the bright ink colour, not in italics. Keys missing from fr.json are read from en.json.
 //   ariaLabel          section landmark name, read by screen readers
 //   heading, paragraphs  copy column
-//   caption            small pixel-font note under the paragraphs
+//   caption            small pixel-font note under the paragraphs, for the zeta trace...
+//   captionWave        ...and for the combined wave function
+//   peakLabel, sepLabel, axes   the wave function's labels: its peak, the packets' separation ({{d}}), the floor axes (en.json only)
+//   controls           the switches under the figure: which figure, bosons / fermions, 3D / 2D, and the drag hint
 //   replay             bottom-right button: restarts the zeta trace from t = 0
 //   transitionCaption  bottom-left while the Standard Model Lagrangian is written during the transition
 //   valueLabel         the label riding next to the comet head; {{t}} is the current t (en.json only)

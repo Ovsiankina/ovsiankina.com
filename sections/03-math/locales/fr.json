@@ -6,6 +6,16 @@
     "Mon rêve est de ne pas seulement les utiliser. J'aimerais un jour <em>faire avancer une vraie question ouverte</em>, même d'un petit pas."
   ],
   "caption": "ζ(½ + it) SUR LA DROITE CRITIQUE. CHAQUE PASSAGE PAR L'ORIGINE EST UN ZÉRO NON TRIVIAL. L'HYPOTHÈSE DE RIEMANN AFFIRME QU'ILS Y SONT TOUS.",
+  "captionWave": "|ψ(x₁, x₂)|² POUR DEUX PARTICULES IDENTIQUES QUI SE CROISENT SUR UNE DROITE. LES BOSONS S'ACCUMULENT LÀ OÙ x₁ = x₂. LES FERMIONS NE S'Y RENCONTRENT JAMAIS : LE PRINCIPE D'EXCLUSION DE PAULI.",
+  "controls": {
+    "viewLabel": "Figure",
+    "wave": "FONCTION D'ONDE",
+    "kindLabel": "Particules",
+    "dimLabel": "Vue",
+    "hint3d": "GLISSER POUR TOURNER, VERS LE HAUT POUR APLATIR",
+    "hint2d": "GLISSER POUR TOURNER, VERS LE BAS POUR LA 3D",
+    "hintTouch": "GLISSER POUR TOURNER"
+  },
   "replay": "REJOUER",
   "transitionCaption": "LAGRANGIEN DU MODÈLE STANDARD",
   "tuning": {

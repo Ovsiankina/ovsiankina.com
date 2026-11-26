@@ -15,6 +15,9 @@ export default {
     'line':      '#3a3833',    // frame of the switches
   },
 
+  // the figure shown first, 'wave' or 'riemann'; the switch under the figure picks the other, and the choice is saved
+  view: 'wave',
+
   pixel: 2,                    // CSS px per drawn pixel (same as the landing)
 
   // side-by-side layout only when the section is at least this wide AND the window this landscape; else portrait
@@ -38,6 +41,39 @@ export default {
     leader: { short: 22, long: 32, narrow: 600 },  // 30° leader to the value label, drawn pixels; short below `narrow` CSS px
     fadeS: 1.6,                // dissolve at the end before it starts over, s
     reducedSpeed: 0.35,        // speed factor with prefers-reduced-motion
+  },
+
+  // ---------- combined wave function |psi(x1, x2)|^2 (wave.js) ----------
+  wave: {
+    // height -> colour, low to high: the purple -> green -> yellow scale of the papers, lifted to read on black
+    stops: [[70, 40, 150], [58, 105, 200], [45, 170, 175], [120, 215, 135], [245, 232, 120]],
+    levels: 4,                 // brightness steps a line is dithered between (plus none)
+    line: [0.5, 0.5],          // brightness of one grid line: on the floor, and what the top of a peak adds
+    cut: 0.2,                  // dimmer than this, a line is not drawn: the rim ends instead of crumbling into stray dots
+    sigma: 0.65,               // width of each packet
+    k: 2.2,                    // its wave number: the fringes when the two overlap
+    mass: 1.35,                // the surface is normalised to this volume
+    sep: { mid: 1.25, amp: 1.15, speed: 0.42 },   // the packets sit at -d and +d, d = mid + amp cos(speed t)
+    span: 7.2,                 // the grid covers [-span, span] on both axes...
+    stretch: 1.9,              // ...with its lines bunched towards the middle (sinh), where things happen
+    fade: [5.2, 6.4],          // the sheet fades out between these radii
+    lines: [26, 60],           // grid lines per axis, least and most: as many as fit `cell` drawn pixels apart
+    cell: 5.5,
+    fit: [6.6, 4.8],           // half-width of the stage, in units of x, at the least: side by side (the whole sheet), and
+                               // portrait (its rim runs off the sides, so the packets stay readable on a phone)
+    scale: 0.105,              // ...or one unit of x is this fraction of the figure's height, whichever is smaller
+    height: 0.32,              // |psi|^2 = 1 rises this fraction of the figure's height
+    floor: 0.66,               // the plane's centre, fraction of the figure's height from its top
+    yaw: 0.7, pitch: 0.55,     // resting angles, rad (pitch 0: edge-on)
+    drag: { yaw: 0.008, pitch: 0.006, maxPitch: 1.45 },   // rad per CSS px dragged
+    // dragged flatter than `at`, it snaps to 2D (armed again once back above `arm`); in 2D, `pull` px down brings 3D back
+    snap: { at: 0.08, arm: 0.2, pull: 28, in: 700, out: 950 },
+    axis: 5.1,                 // half-length of the axes, units of x
+    axisAlpha: 0.5,            // the floor axes in 3D (the 2D ones take trace.axisAlpha)
+    bins: 220,                 // most points along the 2D curve
+    halo: { r: 2.3, alpha: 0.95, power: 1.5, blend: 0.4 },   // the 2D curve's halo, as the trace's
+    ball: { top: [30, 0.17], r: [4, 9, 0.024] },  // packet centres: height max(px, fraction), radius min/max/fraction of width; drawn pixels
+    follow: 0.12,              // time constant of the peak label following the peak, s
   },
 
   // speed and colour of the trace (the tuning panel edits these live)

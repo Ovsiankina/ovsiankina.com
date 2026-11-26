@@ -30,6 +30,10 @@ The language is picked once per page load (`core/lang.js`): the choice saved by 
 
 At the right end of the same line, "skip transitions" (`core/skip.js`), for visitors who have already seen the animations: while it is on, every transition plays its short reduced-motion cut and no lead-in dwells. The choice is saved.
 
+## Maths figure
+
+The maths section shows one of two figures, picked with the switch under it (saved; `view` in its `config.js` comes first): the combined wave function of two identical particles (`wave.js`), a surface that snaps flat into a curve when dragged edge-on, or the zeta trace of the Riemann hypothesis. In the admin shell: `figure wave` / `figure riemann`.
+
 ## Admin shell
 
 Press `~` anywhere. `help` lists the commands. `ls` lists the sections with their numbers. `cd 3` or `cd math` plays the transition into that section from wherever you are. `lang fr` switches the language. `skip on` / `skip off` sets skipping the transitions. `#s3` in the address bar opens on section 3, through its transition.

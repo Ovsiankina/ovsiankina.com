@@ -1,12 +1,18 @@
-// Maths section: copy column + zeta(1/2 + it) traced on the landing's 2 px pixel grid with 8x8 Bayer dithering.
-// The trace runs while the section is on screen and loops: it slows down at each non-trivial zero, dissolves at the end
-// and starts over.
+// Maths section: copy column + one of two figures on the landing's 2 px pixel grid with 8x8 Bayer dithering, picked
+// with the switch under it (the choice is saved; config.view comes first):
+//   wave     the combined wave function of two identical particles, a surface that snaps flat into a curve (wave.js)
+//   riemann  zeta(1/2 + it), traced while the section is on screen: it slows down at each non-trivial zero,
+//            dissolves at the end and starts over
+// Only the figure showing is drawn.
 import t from './content.js';
 import config from './config.js';
 import { zeta } from './zeta.js';
 import { BAYER, pack, cssRgb } from './pixels.js';
 import { mountLeadIn } from './leadin.js';
+import { createWave } from './wave.js';
 import { replayButton } from '../../core/replay.js';
+import { dissolve } from '../../core/dither.js';
+import { MS } from '../../core/lang.js';
 import { screenH, onScreen } from '../../core/viewport.js';
 
 export const id = 'math';
@@ -17,6 +23,10 @@ export const leadIn = { edges: { top: config.leadIn.black, bottom: config.palett
 
 const P = config.pixel;
 const TR = config.trace;
+const VIEWS = ['wave', 'riemann'], VIEW_KEY = 'math-view';
+let view = config.view;
+try { const saved = localStorage.getItem(VIEW_KEY); if (VIEWS.includes(saved)) view = saved; } catch {}
+const COARSE = matchMedia('(pointer: coarse)').matches;
 
 // OKLab mix of yellow and teal, 256 steps
 const lin = v => (v /= 255) <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
@@ -49,25 +59,41 @@ for (let i = 1; i < COUNT - 1; i++) if (MAG[i] < 0.03 && MAG[i] <= MAG[i - 1] &&
   ZEROS.push((a + b) / 2);
 }
 
-// the inside of .copy, rewritten on a language switch
+// the inside of .copy, rewritten on a language switch; the caption is the one of the figure showing
+const caption = () => t(view === 'wave' ? 'captionWave' : 'caption');
 const copyText = () => `
     <h2>${t('heading')}</h2>
     ${t('paragraphs', { returnObjects: true }).map(p => `<p>${p}</p>`).join('\n    ')}
-    <div class="cap">${t('caption')}</div>`;
+    <div class="cap">${caption()}</div>`;
 
+// the switches under the figure, in the style of the top bar's EN / FR. data-k: the button's word in locales (controls)
+const seg = (cls, attr, keys) => `<div class="seg ${cls}" role="group">${keys.map(k => `<button type="button" data-${attr}="${k}" data-k="${k}"></button>`).join('')}</div>`;
 function markup() {
   return `
   <canvas class="trace" aria-hidden="true"></canvas>
   <div class="copy">${copyText()}
   </div>
-  <div class="stage"></div>
-  <div class="zlabel" aria-hidden="true"></div>`;
+  <div class="stage">
+    <canvas class="wave" aria-hidden="true"></canvas>
+    <div class="wlabel peak" aria-hidden="true"></div>
+    <div class="wlabel sep" aria-hidden="true"></div>
+    <div class="wlabel ax1" aria-hidden="true"></div>
+    <div class="wlabel ax2" aria-hidden="true"></div>
+  </div>
+  <div class="zlabel" aria-hidden="true"></div>
+  <div class="controls">
+    ${seg('view', 'view', VIEWS)}
+    ${seg('kind wave-only', 'kind', ['bosons', 'fermions'])}
+    ${seg('dim wave-only', 'dim', ['3d', '2d'])}
+    <span class="hint wave-only"></span>
+  </div>`;
 }
 
 export async function mount(root, env) {
   const REDUCED = env.reduced;
   root.setAttribute('aria-label', t('ariaLabel'));
   for (const [k, v] of Object.entries(config.palette)) root.style.setProperty('--' + k, v);
+  root.dataset.view = view;
   root.innerHTML = markup();
   // replays the Lagrangian transition into this section, which itself starts the trace over underneath
   const replayEl = replayButton(root, t('replay'), () => env.nav.goTo(env.index));
@@ -87,6 +113,33 @@ export async function mount(root, env) {
   const stageEl = root.querySelector('.stage'), copyEl = root.querySelector('.copy');
   const zc = root.querySelector('canvas.trace'), zctx = zc.getContext('2d');
   const labelEl = root.querySelector('.zlabel');
+  const ctrlEl = root.querySelector('.controls'), hintEl = ctrlEl.querySelector('.hint');
+  const press = (cls, attr, val) => { for (const b of ctrlEl.querySelectorAll(`.${cls} button`)) b.setAttribute('aria-pressed', b.dataset[attr] === val); };
+
+  // ---------- the combined wave function (wave.js) ----------
+  const wave = createWave({
+    root, stage: stageEl, canvas: stageEl.querySelector('canvas.wave'), reduced: REDUCED,
+    labels: Object.fromEntries(['peak', 'sep', 'ax1', 'ax2'].map(k => [k, stageEl.querySelector('.wlabel.' + k)])),
+    reserve: () => ctrlEl.offsetHeight + 28,
+    sepText: d => t('sepLabel', { d: d.toFixed(2) }),
+    onMode: mode => { press('dim', 'dim', mode); hint(mode); },
+  });
+  function hint(mode = wave.mode) {
+    hintEl.textContent = t('controls.' + (COARSE ? 'hintTouch' : mode === '2d' ? 'hint2d' : 'hint3d'));
+  }
+  // the words of the switches and of the wave function's fixed labels, put in again on a language switch
+  function controlText() {
+    const c = k => t('controls.' + k), axes = t('axes', { returnObjects: true });   // key by key: fr.json holds only what differs
+    for (const b of ctrlEl.querySelectorAll('button')) b.textContent = c(b.dataset.k);
+    for (const [cls, key] of [['view', 'viewLabel'], ['kind', 'kindLabel'], ['dim', 'dimLabel']]) ctrlEl.querySelector('.' + cls).setAttribute('aria-label', c(key));
+    stageEl.querySelector('.wlabel.peak').textContent = t('peakLabel');
+    stageEl.querySelector('.wlabel.ax1').textContent = axes[0];
+    stageEl.querySelector('.wlabel.ax2').textContent = axes[1];
+    hint();
+  }
+  controlText();
+  press('view', 'view', view); press('kind', 'kind', 'bosons'); press('dim', 'dim', '3d');
+  wave.active = view === 'wave';
   let readEl = null;                               // tuning panel readout (TEST ONLY)
 
   const Z = {
@@ -130,6 +183,7 @@ export async function mount(root, env) {
 
     Z.drawn = 0;
     zExtend(Math.floor(Z.t / DT));
+    wave.layout();
   }
 
   // deposit a trail point with its dithered halo
@@ -285,11 +339,50 @@ export async function mount(root, env) {
   let raf = 0, last = 0, visible = false, paused = false;
   function frame(now) {
     const dt = Math.max(0, Math.min(0.05, (now - last) / 1000)); last = now;   // kick() stamps last after the rAF time
-    zFrame(dt);
+    if (view === 'wave') wave.frame(dt); else zFrame(dt);
     raf = visible && !paused ? requestAnimationFrame(frame) : 0;
   }
   function kick() { if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); } }
-  function restart() { zReset(); Z.running = true; paused = false; kick(); }
+  function restart() { zReset(); wave.restart(); Z.running = true; paused = false; kick(); }
+  const draw = () => { zLayout(); zRender(); wave.render(); };
+
+  // ---------- the switches ----------
+  // which figure: the one showing dithers out with its caption, the other dithers in (as the words do on EN / FR)
+  let switching = false;
+  const figure = () => [zc, labelEl, stageEl, copyEl.querySelector('.cap'), ...ctrlEl.querySelectorAll('.wave-only')];
+  async function setView(next) {
+    if (!VIEWS.includes(next) || next === view || switching) return false;
+    switching = true;
+    press('view', 'view', next);
+    try {
+      await dissolve(figure(), 0, MS);
+      view = next; root.dataset.view = view; wave.active = view === 'wave';
+      try { localStorage.setItem(VIEW_KEY, view); } catch {}
+      copyEl.querySelector('.cap').innerHTML = caption();
+      zReset(); wave.restart();                    // either one starts from the beginning
+      draw();                                      // the portrait layout depends on the caption's height
+      const now = figure();
+      dissolve(now, 0, 0);
+      await dissolve(now, 1, MS);
+    } finally { switching = false; }
+    return true;
+  }
+  ctrlEl.addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    if (b.dataset.view) setView(b.dataset.view);
+    else if (b.dataset.kind) { wave.setBosons(b.dataset.kind === 'bosons'); press('kind', 'kind', b.dataset.kind); if (!raf) wave.render(); }
+    else if (b.dataset.dim) { wave.setMode(b.dataset.dim); kick(); }
+  });
+  env.command('figure', {
+    usage: 'figure [name]', about: `show or pick the maths figure (${VIEWS.join(', ')})`,
+    run: async ([arg], print) => {
+      if (arg === undefined) { print(`figure: ${view}`); return; }
+      const v = arg.toLowerCase();
+      if (!VIEWS.includes(v)) { print(`figure: expected ${VIEWS.join(' or ')}, got "${arg}"`, 'err'); return; }
+      print(await setView(v) ? `figure: ${v}` : `figure: already ${view}, or a switch is running`, 'ok');
+    },
+  });
 
   // -1px: a section merely touching the screen's edge (just left above or below) counts as off screen
   const io = new IntersectionObserver(e => {
@@ -298,23 +391,24 @@ export async function mount(root, env) {
   }, { rootMargin: '-1px 0px' });
   io.observe(root);
 
-  onScreen(() => { zLayout(); zRender(); });   // not on a toolbar slide: that would restart the trace mid-scroll
+  onScreen(draw);                                // not on a toolbar slide: that would restart the trace mid-scroll
 
-  zLayout(); zRender();
+  draw();
   // the portrait layout depends on the copy's height, which depends on the fonts
-  const ready = (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { zLayout(); zRender(); });
+  const ready = (document.fonts ? document.fonts.ready : Promise.resolve()).then(draw);
 
   return {
     ready,
     restart,                                       // the transition starts the trace over, alive underneath
     onEnter() { paused = false; Z.running = true; kick(); },
     onLeave() { paused = true; io.unobserve(root); io.observe(root); },   // re-observe: resumes if still on screen afterwards
-    words: () => [copyEl, replayEl],
+    words: () => [copyEl, replayEl, ctrlEl],
     relang() {
       root.setAttribute('aria-label', t('ariaLabel'));
       copyEl.innerHTML = copyText();
       replayEl.textContent = t('replay');
-      zLayout(); zRender();                        // the portrait layout depends on the copy's height
+      controlText();
+      draw();                                      // the portrait layout depends on the copy's height
     },
   };
 }
