@@ -8,6 +8,11 @@ import { lang, MS, localized } from './lang.js';
 const KEY = 'skip';
 const WORDS = { en: ['Skip transitions', 'Skip'], fr: ['Passer les transitions', 'Passer'] };   // [wide, phones]
 
+// the saved choice, also read by index.html's <head> guard (same key) for the mostoslavsky.com intro
+export function skipSaved() {
+  try { return localStorage.getItem(KEY) === '1'; } catch { return false; }
+}
+
 export function skipSwitch(nav, bar) {
   const el = document.createElement('div');
   el.className = 'skip-switch';
@@ -26,8 +31,7 @@ export function skipSwitch(nav, bar) {
     b.setAttribute('aria-pressed', nav.skip);
     try { localStorage.setItem(KEY, nav.skip ? '1' : '0'); } catch {}
   };
-  let saved = false;
-  try { saved = localStorage.getItem(KEY) === '1'; } catch {}
+  const saved = skipSaved();
   nav.skip = saved;
   b.setAttribute('aria-pressed', saved);
   bar.appendChild(el);

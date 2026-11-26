@@ -34,10 +34,14 @@ import { createNavigator } from './navigator.js';
 import { createShell } from './shell.js';
 import { createSeams } from './seam.js';
 import { lang, LANGS, langSwitch } from './lang.js';
-import { skipSwitch } from './skip.js';
+import { skipSwitch, skipSaved } from './skip.js';
+import { playIntro, introRequested, stripIntroParam } from './intro.js';
 
 const site = document.getElementById('site');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+// arriving through the mostoslavsky.com redirect (?from=mostoslavsky): its intro plays at once, over the page
+// loading underneath. Not for reduced motion, not with "skip transitions" on (index.html's guard agrees)
+const intro = introRequested() && !reduced && !skipSaved() ? playIntro() : (stripIntroParam(), null);
 history.scrollRestoration = 'manual';
 scrollTo(0, 0);
 
@@ -128,10 +132,24 @@ command('lang', {
     else print('lang: busy (a transition or a switch is running), try again', 'err');
   },
 });
+command('intro', {
+  usage: 'intro', about: 'play the mostoslavsky.com intro (click or any key ends it)',
+  run: async (_, print) => {
+    if (reduced) { print('intro: off, the browser asks for reduced motion', 'err'); return; }
+    print('intro: mostoslavsky -> mostoslavski', 'ok');
+    await playIntro();
+  },
+});
 createShell(nav, sections, commands);
 window.__site = { nav, sections, goTo: (n, o) => nav.goTo(n, o) };   // console / test access
 
 // #s3 in the address opens straight on section 3, through its transition
 const deep = /^#s(\d+)$/.exec(location.hash);
 if (deep && +deep[1] > 1) nav.goTo(+deep[1]);
-else sections[0].instance.onEnter?.({ via: 'load' });
+else if (intro) {
+  // like under a transition: the landing holds on its first frame, and its own intro starts once uncovered
+  const first = sections[0].instance;
+  await first.prepare?.();
+  await intro;
+  first.onEnter?.({ via: 'intro' });
+} else sections[0].instance.onEnter?.({ via: 'load' });

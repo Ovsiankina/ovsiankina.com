@@ -4,6 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>David Mostoslavski</title>
+<script>
+  // the mostoslavsky.com intro (core/intro.js) is coming: keep the page hidden until its canvas covers it.
+  // Same conditions as core/site.js. The timeout is a safety net: the page never stays hidden if the script fails.
+  (function () {
+    var skip = false;
+    try { skip = localStorage.getItem('skip') === '1'; } catch (e) {}
+    if (new URLSearchParams(location.search).get('from') === 'mostoslavsky' && !skip &&
+        !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      var html = document.documentElement;
+      html.classList.add('intro-pending');
+      setTimeout(function () { html.classList.remove('intro-pending'); }, 8000);
+    }
+  })();
+</script>
+<style>html.intro-pending { background: #000; } html.intro-pending body { visibility: hidden; }</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=JetBrains+Mono:wght@400;500&family=Silkscreen&family=Space+Grotesk:wght@400;500&display=swap">
