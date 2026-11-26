@@ -15,6 +15,14 @@ html.locked { overflow: hidden; overscroll-behavior: none; }
 #site > .seam { display: block; position: relative; pointer-events: none; image-rendering: pixelated; }
 #site > .seam.bleed { z-index: 1; }   /* over the background a bleeding section runs on underneath it */
 
+/* under the last section (index.html, core/footer.js): the other spelling of the name. Out of the section flow:
+   no seam, no transition, on the dark the last section fades into */
+.site-footer { padding: 24px 16px 28px; text-align: center; font: 11px/1.5 "IBM Plex Mono", ui-monospace, monospace; color: #5e5a53; }
+.site-footer.pending { visibility: hidden; }
+.site-footer p { margin: 0; }
+.site-footer a { color: #a8a39a; text-decoration: none; border-bottom: 1px dotted #5e5a53; }
+.site-footer a:hover, .site-footer a:focus-visible { color: #ebe7de; border-bottom-color: #ebe7de; outline: none; }
+
 /* the replay button every section uses (core/replay.js); place it inside a positioned box */
 /* framed like the top bar's switches below, and lit on hover like their selected side. Colours come from the section:
    --replay-fg (words, and the fill on hover), --replay-line (frame), --replay-bg, --replay-on (words on hover) */

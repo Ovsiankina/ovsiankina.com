@@ -35,6 +35,7 @@ import { createShell } from './shell.js';
 import { createSeams } from './seam.js';
 import { lang, LANGS, langSwitch } from './lang.js';
 import { skipSwitch } from './skip.js';
+import { footer } from './footer.js';
 import { playIntro, introRequested, stripIntroParam } from './intro.js';
 
 const site = document.getElementById('site');
@@ -104,6 +105,7 @@ for (const s of sections) {
 await Promise.all(sections.map(s => s.mounted));
 seams = createSeams(site, flow);
 nav.remember();
+footer();                                   // under the last section, now that the sections are in
 
 // top bar: the EN / FR switch in the centre, "skip transitions" at its right end
 const bar = document.createElement('div');
