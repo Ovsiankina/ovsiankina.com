@@ -8,7 +8,10 @@ html { scrollbar-gutter: stable; }   /* the scrollbar's room stays when the lock
 html.locked { overflow: hidden; overscroll-behavior: none; }
 [hidden] { display: none !important; }
 
-#site { position: relative; }
+/* clip, not hidden: the pixel-grid canvases (the seams below, core/seam.js) round their width up to whole drawn
+   pixels and overhang the right edge by up to 2 px; that must not make the page scroll sideways. hidden would make
+   #site a scroll container and break the landing's sticky hero; clip does not */
+#site { position: relative; overflow-x: clip; }
 #site > .section, #site > .leadin { position: relative; }
 
 /* the dithered joins between blocks (core/seam.js) */
