@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>David Mostoslavsky, embedded and real-time software engineer</title>
+<meta name="description" content="David Mostoslavsky (also written Mostoslavski): embedded and real-time software engineer specialised in robotics, sole software architect and lead engineer at KM-RoBoTa SA. Full CV at mostoslavski.com.">
+<!-- mostoslavsky.com: its own small page for the "y" spelling (the main site is mostoslavski.com). Deployed alone
+     (git archive HEAD mostoslavsky), so nothing here may reach outside this folder. -->
+<link rel="canonical" href="https://mostoslavsky.com/">
+<meta property="og:type" content="profile">
+<meta property="og:url" content="https://mostoslavsky.com/">
+<meta property="og:title" content="David Mostoslavsky">
+<meta property="og:description" content="Embedded and real-time software engineer, specialised in robotics. Also written Mostoslavski.">
+<meta property="og:image" content="https://mostoslavsky.com/photos/01.jpg">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "David Mostoslavsky",
+  "alternateName": ["David Mostoslavski", "Mostoslavsky", "Mostoslavski"],
+  "url": "https://mostoslavsky.com/",
+  "sameAs": ["https://mostoslavski.com/"],
+  "image": "https://mostoslavsky.com/photos/01.jpg",
+  "jobTitle": "Embedded and real-time software engineer",
+  "worksFor": { "@type": "Organization", "name": "KM-RoBoTa SA" }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Silkscreen&display=swap">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="landing">
+  <div class="lang-switch" role="group" aria-label="Language" hidden>
+    <button type="button" data-lang="en">EN</button><button type="button" data-lang="fr">FR</button>
+  </div>
+  <div class="hero">
+    <canvas class="geo" aria-hidden="true"></canvas>
+    <div class="frame" tabindex="0" role="img" aria-label="Photos of David Mostoslavsky, click for the next one" data-t-label="photoLabel">
+      <canvas class="photo"></canvas>
+      <div class="caption">01 / 02</div>
+    </div>
+    <article class="cv">
+      <header>
+        <h1>David Mostoslavsky</h1>
+        <p class="aka" data-t="aka">Also written Mostoslavski.</p>
+        <p class="role" data-t="role">Embedded and real-time software engineer, specialised in robotics.</p>
+        <p class="avail" data-t="avail">Sole software architect and lead engineer at KM-RoBoTa SA, Renens.</p>
+      </header>
+      <section>
+        <h2 data-t="workH">Work</h2>
+        <p data-t="work">Designed and built <em>kmr_v3</em>, the architecture of KM-RoBoTa's real-time robot-control SDK. Firmware in no-std Rust on ARM Cortex-M4, PREEMPT_RT Linux, CAN, RS485, Bluetooth.</p>
+      </section>
+      <section class="pub">
+        <h2 data-t="pubH">Publication</h2>
+        <p data-t="pub">Lead author, <em>Static and Dynamic Dispatch in Robotics Control Loops: A Practical Performance Study in Rust.</em> IEEE, 2026. <a href="https://ieeexplore.ieee.org/document/11533996" target="_blank" rel="noopener">ieeexplore 11533996</a></p>
+      </section>
+    </article>
+    <a class="dl" href="https://mostoslavski.com/?from=mostoslavsky">
+      <span class="dl-top">
+        <span class="dl-t" data-t="cv">See the full CV</span>
+        <span class="dl-short" data-t="cvShort">Full CV</span>
+        <span class="dl-s">mostoslavski.com</span>
+      </span>
+      <svg viewBox="0 0 8 7" aria-hidden="true"><rect x="4" y="0" width="1" height="1"/><rect x="5" y="1" width="1" height="1"/><rect x="6" y="2" width="1" height="1"/><rect x="0" y="3" width="8" height="1"/><rect x="6" y="4" width="1" height="1"/><rect x="5" y="5" width="1" height="1"/><rect x="4" y="6" width="1" height="1"/></svg>
+    </a>
+  </div>
+</main>
+<script type="module" src="landing.js"></script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+/* mostoslavsky.com: the landing of mostoslavski.com (sections/01-landing), cut down to one screen.
+   One golden rectangle fitted to the viewport: the short CV in its first square, the photos in the .618 square,
+   "see the full CV" in the .236 square. Standing on portrait screens. landing.js places everything and adds
+   .live to the hero; without it (no JS) the text just flows. */
+:root {
+  --bg: #070707; --ink: #ebe7de; --text: #a8a39a; --dim: #5e5a53; --geo: #b9a7d9;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --pixel: "Silkscreen", "IBM Plex Mono", ui-monospace, monospace;
+  --sh: 1vh;   /* 1 % of a screen height that holds still while phone toolbars slide (landing.js) */
+  --fs: 13px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); }
+body { color: var(--text); font-family: var(--mono); }
+[hidden] { display: none !important; }
+
+.hero { position: relative; }
+.hero.live { height: calc(100 * var(--sh)); min-height: 560px; overflow: hidden; }
+.hero canvas { image-rendering: pixelated; pointer-events: none; }
+.hero:not(.live) canvas, .hero:not(.live) .frame { display: none; }
+.hero.live .geo { position: absolute; left: 0; top: 0; z-index: 3; }
+
+/* ---------- photo ---------- */
+.frame { position: absolute; z-index: 2; cursor: pointer; }
+.frame canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: auto; }
+.frame:focus-visible { outline: 1px dashed var(--geo); outline-offset: 10px; }
+.caption {
+  position: absolute; right: 8px; top: 8px; padding: 4px 6px; background: var(--bg);
+  font: 9px/1 var(--pixel); letter-spacing: .08em; color: var(--dim);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+
+/* ---------- ratio labels on each square ---------- */
+.lbl {
+  position: absolute; z-index: 3; pointer-events: none;
+  font: 8px/1 var(--pixel); letter-spacing: .06em; color: var(--geo);
+  opacity: 0; transition: opacity .8s steps(4);
+}
+.lbl.on { opacity: .42; }
+
+/* ---------- CV ---------- */
+.cv {
+  font-size: var(--fs); line-height: 1.5; color: var(--text);
+  display: flex; flex-direction: column; gap: 1.6em; padding: 24px 16px;
+}
+.hero.live .cv {
+  position: absolute; z-index: 1; overflow-y: auto; overflow-x: hidden;
+  scrollbar-width: thin; scrollbar-color: var(--dim) transparent;
+}
+.cv header { display: flex; flex-direction: column; gap: .35em; }
+.cv h1 {
+  margin: 0 0 .25em; font: 400 calc(var(--fs) * 2.55)/1 var(--pixel);
+  color: var(--ink); letter-spacing: .02em; text-wrap: balance;
+}
+.cv p { margin: 0; }
+.cv .aka { color: var(--dim); }
+.cv .role { color: var(--ink); font-weight: 500; }
+.cv section { display: flex; flex-direction: column; gap: .45em; }
+.cv h2 {
+  margin: 0; font: 400 calc(var(--fs) * .78)/1.4 var(--pixel);
+  letter-spacing: .14em; color: var(--geo); text-transform: uppercase;
+}
+.cv a { color: var(--ink); text-decoration: none; border-bottom: 1px dotted var(--dim); }
+.cv a:hover, .cv a:focus-visible { border-bottom-color: var(--ink); outline: none; }
+.cv em { font-style: normal; color: var(--ink); }
+/* portrait: the square is small, the publication stays on the full CV */
+.hero.port .cv h1 { font-size: calc(var(--fs) * 2.2); }
+.hero.port .cv .pub { display: none; }
+
+/* typewriter: every glyph is a span, hidden until the pen reaches it (layout never moves) */
+.cv .c { visibility: hidden; }
+.cv .c.on { visibility: visible; }
+.cv .c.head { background: var(--ink); color: var(--bg); }
+.cursor { display: inline-block; width: .6em; height: 1.05em; vertical-align: -.18em; background: var(--ink); margin-left: .2em; visibility: hidden; }
+.cursor.on { visibility: visible; animation: blink 1.1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.cv::-webkit-scrollbar { width: 6px; }
+.cv::-webkit-scrollbar-thumb { background: var(--dim); }
+
+/* ---------- "see the full CV": fills the .236 square, a link to mostoslavski.com ---------- */
+.dl {
+  display: flex; flex-direction: column; justify-content: space-between; gap: 18px;
+  margin: 0 16px 24px; padding: var(--pad, 18px); text-decoration: none;
+  background: var(--ink); color: var(--bg); overflow: hidden;
+}
+.hero.live .dl { position: absolute; z-index: 4; margin: 0; }
+.dl-top { display: flex; flex-direction: column; gap: 6px; }
+.dl-t { font: 400 12px/1.25 var(--pixel); letter-spacing: .06em; text-transform: uppercase; }
+.dl-s { font: 400 11px/1.3 var(--mono); opacity: .7; }
+.dl-short { display: none; font: 400 13px/1.15 var(--pixel); letter-spacing: .06em; text-transform: uppercase; }
+.dl svg { align-self: flex-end; width: 24px; height: 21px; shape-rendering: crispEdges; fill: currentColor; }
+.dl:hover, .dl:focus-visible { background: var(--bg); color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); outline: none; }
+.dl:hover svg, .dl:focus-visible svg { animation: nudge .6s steps(2) infinite; }
+@keyframes nudge { 50% { transform: translateX(2px); } }
+/* small square (phones): short label */
+.dl.compact .dl-t { display: none; }
+.dl.compact .dl-short { display: block; }
+.dl.compact .dl-s { font-size: 10px; }
+.dl.compact svg { width: 16px; height: 14px; }
+.dl.tiny .dl-s { display: none; }
+.dl.tiny .dl-short { font-size: 10px; }
+
+/* ---------- replay, and the EN / FR switch (top centre), framed like on mostoslavski.com ---------- */
+.replay-btn, .lang-switch { border: 1px solid #3a3833; background: rgba(7, 7, 7, .88); }
+.replay-btn, .lang-switch button {
+  padding: 7px 10px; cursor: pointer;
+  font: 9px/1 var(--pixel); letter-spacing: .1em; text-transform: uppercase; color: var(--ink);
+}
+.replay-btn { position: absolute; z-index: 60; right: 16px; bottom: 14px; }
+.replay-btn:hover, .replay-btn:focus-visible { background: var(--ink); border-color: var(--ink); color: var(--bg); outline: none; }
+.lang-switch { position: fixed; z-index: 70; top: 8px; left: 50%; transform: translateX(-50%); display: flex; }
+.lang-switch button { border: 0; background: none; color: var(--dim); }
+.lang-switch button:hover, .lang-switch button:focus-visible { color: var(--ink); outline: none; }
+.lang-switch button[aria-pressed="true"] { background: var(--ink); color: var(--bg); cursor: default; }
