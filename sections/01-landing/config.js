@@ -7,7 +7,6 @@ export default {
     'assets/photos/03.jpg',
     'assets/photos/04.jpg',
     'assets/photos/05.jpg',
-    'assets/photos/06.jpg',
   ],
 
   // conventional PDF CV behind the .236 square
