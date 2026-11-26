@@ -51,15 +51,27 @@ html.locked { overflow: hidden; overscroll-behavior: none; }
   font: inherit; color: #ebe7de; caret-color: #ebe7de;
 }
 
-/* language switch (core/lang.js): top centre, above the transitions, under the admin shell */
-.lang-switch {
-  position: fixed; z-index: 950; top: 8px; left: 50%; transform: translateX(-50%);
-  display: flex; border: 1px solid #3a3833; background: rgba(7, 7, 7, .88);
+/* top bar (core/site.js): above the transitions, under the admin shell. The language switch (core/lang.js) sits
+   top centre, "skip transitions" (core/skip.js) at the right end of the same line */
+.top-bar {
+  position: fixed; z-index: 950; top: 8px; left: 0; right: 0; display: flex; justify-content: center;
+  pointer-events: none;
   font: 9px/1 "Silkscreen", "IBM Plex Mono", ui-monospace, monospace; letter-spacing: .1em;
 }
-.lang-switch button {
+.lang-switch, .skip-switch { display: flex; border: 1px solid #3a3833; background: rgba(7, 7, 7, .88); }
+.lang-switch, .skip-switch { pointer-events: auto; }
+.skip-switch { position: absolute; top: 0; right: 8px; }
+.skip-switch button { white-space: nowrap; }
+.skip-switch button[aria-pressed="true"] { background: #ebe7de; color: #070707; }
+.skip-switch .short { display: none; }
+@media (max-width: 520px) {
+  .skip-switch .full { display: none; }
+  .skip-switch .short { display: inline; }
+}
+.lang-switch button, .skip-switch button {
   padding: 7px 10px; border: 0; background: none; cursor: pointer;
   font: inherit; letter-spacing: inherit; color: #5e5a53;
 }
-.lang-switch button:hover, .lang-switch button:focus-visible { color: #ebe7de; outline: none; }
+.lang-switch button:hover, .lang-switch button:focus-visible,
+.skip-switch button:hover, .skip-switch button:focus-visible { color: #ebe7de; outline: none; }
 .lang-switch button[aria-pressed="true"] { background: #ebe7de; color: #070707; cursor: default; }

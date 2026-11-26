@@ -31,6 +31,7 @@ import { createNavigator } from './navigator.js';
 import { createShell } from './shell.js';
 import { createSeams } from './seam.js';
 import { lang, LANGS, langSwitch } from './lang.js';
+import { skipSwitch } from './skip.js';
 
 const site = document.getElementById('site');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -96,7 +97,22 @@ await Promise.all(sections.map(s => s.mounted));
 seams = createSeams(site, flow);
 nav.remember();
 
-const swap = langSwitch(nav, sections);
+// top bar: the EN / FR switch in the centre, "skip transitions" at its right end
+const bar = document.createElement('div');
+bar.className = 'top-bar';
+document.body.appendChild(bar);
+const swap = langSwitch(nav, sections, bar);
+const setSkip = skipSwitch(nav, bar);
+command('skip', {
+  usage: 'skip [on|off]', about: 'show or set skipping the transitions',
+  run: ([arg], print) => {
+    const a = arg?.toLowerCase();
+    if (a === undefined) { print(`skip: ${nav.skip ? 'on' : 'off'}`); return; }
+    if (a !== 'on' && a !== 'off') { print(`skip: expected on or off, got "${arg}"`, 'err'); return; }
+    setSkip(a === 'on');
+    print(`skip: ${a}`, 'ok');
+  },
+});
 command('lang', {
   usage: 'lang [en|fr]', about: 'show or switch the site language',
   run: async ([arg], print) => {

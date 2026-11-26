@@ -28,6 +28,8 @@ English and French, through [i18next](https://www.i18next.com/). Each section's 
 
 The language is picked once per page load (`core/lang.js`): the choice saved by the EN / FR switch (top centre), else the first of the browser's languages that is English or French, else English. Switching saves the choice and rewrites the words in place: every section's text dithers out at once, each section puts in the new words (`relang()`, see `core/site.js`), and they dither back in. The switch itself dithers away while a transition plays.
 
+At the right end of the same line, "skip transitions" (`core/skip.js`), for visitors who have already seen the animations: while it is on, every transition plays its short reduced-motion cut and no lead-in dwells. The choice is saved.
+
 ## Admin shell
 
-Press `~` anywhere. `help` lists the commands. `ls` lists the sections with their numbers. `cd 3` or `cd math` plays the transition into that section from wherever you are. `lang fr` switches the language. `#s3` in the address bar opens on section 3, through its transition.
+Press `~` anywhere. `help` lists the commands. `ls` lists the sections with their numbers. `cd 3` or `cd math` plays the transition into that section from wherever you are. `lang fr` switches the language. `skip on` / `skip off` sets skipping the transitions. `#s3` in the address bar opens on section 3, through its transition.

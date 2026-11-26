@@ -12,6 +12,7 @@ const WATCHDOG = 20000;   // ms: a transition that never resolves (stalled asset
 export function createNavigator(sections, blocks) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let busy = false;
+  let skip = false;                            // the top bar's "skip transitions" (core/skip.js)
   const watchers = [];
   const setBusy = on => { busy = on; for (const f of watchers) f(on); };
 
@@ -75,7 +76,7 @@ export function createNavigator(sections, blocks) {
       let dog;
       try {
         await Promise.race([
-          s.transition.play({ ghost, layer, root: s.root, section: s.instance, index: n, via, reduced, from: from.index }),
+          s.transition.play({ ghost, layer, root: s.root, section: s.instance, index: n, via, reduced: reduced || skip, from: from.index }),
           new Promise(res => { dog = setTimeout(() => { console.warn(`[transition ${s.dir}] cut after ${WATCHDOG} ms`); res(); }, WATCHDOG); }),
         ]);
       } catch (e) { console.error(`[transition ${s.dir}]`, e); }
@@ -111,7 +112,7 @@ export function createNavigator(sections, blocks) {
     let hit = -1;                              // the deepest one crossed (a fling or End can cross several)
     for (let i = 1; i < sections.length; i++) if (!played.has(i + 1) && was[i] >= -1 && tops[i] < -1) hit = i;
     if (hit < 0) return;
-    const s = sections[hit], dwell = s.mod.leadIn?.dwell || 0;
+    const s = sections[hit], dwell = skip ? 0 : s.mod.leadIn?.dwell || 0;
     if (!dwell) { goTo(hit + 1, { via: 'scroll' }); return; }
     waiting = true;
     lock(true);
@@ -124,6 +125,9 @@ export function createNavigator(sections, blocks) {
     goTo,
     remember,
     get busy() { return busy; },
+    // skipping: every transition plays its short reduced-motion cut instead, and no lead-in dwells
+    get skip() { return skip; },
+    set skip(on) { skip = !!on; },
     watch(f) { watchers.push(f); },          // f(busy): called as a transition starts (true) and ends (false)
     get current() { return here().index; },
   };
