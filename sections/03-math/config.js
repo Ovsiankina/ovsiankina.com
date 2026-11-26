@@ -27,8 +27,12 @@ export default {
     stagePad: [24, 0.14],      // margin around the curve: max(px, fraction of the stage's short side), in drawn pixels
     axisAlpha: 0.16,           // dotted axes (construction lines, like the landing spiral)
     trailAlpha: 0.92,          // the drawn curve
-    haloR: 3,                  // dithered halo around the curve, drawn pixels
-    haloAlpha: 0.42,
+    // dithered halo around the curve: share of the pixels lit right next to it (alpha), falling to none at r drawn
+    // pixels (power: how fast). Tight and dense on purpose: a wide sparse one leaves stray pixels floating by the line
+    haloR: 2.3,
+    haloAlpha: 0.95,
+    haloPower: 1.5,
+    haloBlend: 0.4,            // how much of the curve's colour a lit halo pixel takes
     tail: 150,                 // comet length, in samples behind the head
     headR: 10,                 // dithered glow around the head, drawn pixels
     leader: { short: 22, long: 32, narrow: 600 },  // 30° leader to the value label, drawn pixels; short below `narrow` CSS px

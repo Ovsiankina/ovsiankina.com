@@ -133,17 +133,17 @@ export async function mount(root, env) {
   }
 
   // deposit a trail point with its dithered halo
-  const HALO_R = TR.haloR;
+  const HALO_R = TR.haloR, HALO_C = Math.ceil(HALO_R);
   function zPlot(x, y, k) {
     const ix = x | 0, iy = y | 0, GW = Z.GW, GH = Z.GH;
-    if (ix < -HALO_R || iy < -HALO_R || ix >= GW + HALO_R || iy >= GH + HALO_R) return;
+    if (ix < -HALO_C || iy < -HALO_C || ix >= GW + HALO_C || iy >= GH + HALO_C) return;
     if (ix >= 0 && iy >= 0 && ix < GW && iy < GH) { const i = iy * GW + ix; Z.trA[i] = TR.trailAlpha; Z.trK[i] = k; }
-    for (let dy = -HALO_R; dy <= HALO_R; dy++) {
+    for (let dy = -HALO_C; dy <= HALO_C; dy++) {
       const yy = iy + dy; if (yy < 0 || yy >= GH) continue;
-      for (let dx = -HALO_R; dx <= HALO_R; dx++) {
+      for (let dx = -HALO_C; dx <= HALO_C; dx++) {
         const xx = ix + dx; if (xx < 0 || xx >= GW) continue;
         const d = Math.hypot(dx, dy); if (d > HALO_R) continue;
-        const a = TR.haloAlpha * (1 - d / HALO_R) ** 1.4, j = yy * GW + xx;
+        const a = TR.haloAlpha * (1 - d / HALO_R) ** TR.haloPower, j = yy * GW + xx;
         if (a > Z.glA[j]) { Z.glA[j] = a; Z.glK[j] = k; }
       }
     }
@@ -221,7 +221,7 @@ export async function mount(root, env) {
         const bt = BAYER[brow | (x & 7)];
         if (vis < 1 && BAYER[(((x + 3) & 7) << 3) | ((y + 5) & 7)] > vis) { out32[i] = c; continue; }
         const g = glA[i];
-        if (g > 0 && bt < g) c = blend(c, PAL[(glK[i] * 255) | 0], 0.5);
+        if (g > 0 && bt < g) c = blend(c, PAL[(glK[i] * 255) | 0], TR.haloBlend);
         const a = trA[i];
         if (a > 0) c = blend(c, PAL[(trK[i] * 255) | 0], a);
         const h = hot[i];
