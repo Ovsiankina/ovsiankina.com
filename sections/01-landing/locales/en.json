@@ -93,7 +93,15 @@
     "title": "Download the CV",
     "short": "CV",
     "sub": "PDF, Swiss format",
-    "label": "Download the CV, PDF in Swiss format"
+    "label": "Download the CV or the letter of recommendation",
+    "cv": "Download the CV",
+    "cvOff": "Currently unavailable",
+    "cvOffShort": "N/A",
+    "letter": "Letter of recommendation",
+    "letterShort": "Letter",
+    "letterSub": "KM-RoBoTa SA, PDF",
+    "letterLabel": "Download the letter of recommendation from KM-RoBoTa, PDF",
+    "cvOffLabel": "CV, currently unavailable"
   },
   "replay": "Replay"
 }

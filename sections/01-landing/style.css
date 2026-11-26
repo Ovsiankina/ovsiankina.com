@@ -97,25 +97,54 @@
 .s-landing .cv::-webkit-scrollbar-track { background: transparent; }
 .s-landing .cv:focus-visible { outline: 1px dashed var(--geo); outline-offset: -4px; }
 
-/* conventional PDF CV: fills the .236 square exactly */
+/* download square: fills the .236 square exactly. Clicked, it dithers into two halves (section.js):
+   the CV on top (purple; clicked, it dithers to grey: unavailable), the KM-RoBoTa letter below (yellow) */
+.s-landing .dlbox { position: absolute; z-index: 4; }
 .s-landing .dl {
-  position: absolute; z-index: 4;
+  position: absolute; inset: 0; margin: 0; border: 0; cursor: pointer; text-align: left; font: inherit;
   display: flex; flex-direction: column; justify-content: space-between;
-  padding: 18px; background: var(--ink); color: var(--bg); text-decoration: none; overflow: hidden;
+  padding: var(--pad, 18px); background: var(--ink); color: var(--bg); overflow: hidden;
 }
-.s-landing .dl-top { display: flex; flex-direction: column; gap: 6px; }
+.s-landing .dl-top, .s-landing .dl-txt { display: flex; flex-direction: column; gap: 6px; }
 .s-landing .dl-t { font: 400 12px/1.25 var(--pixel); letter-spacing: .06em; text-transform: uppercase; }
 .s-landing .dl-s { font: 400 11px/1.3 var(--mono); opacity: .7; }
 .s-landing .dl-short { display: none; font: 400 16px/1 var(--pixel); letter-spacing: .06em; }
-.s-landing .dl svg { align-self: flex-end; width: 21px; height: 24px; shape-rendering: crispEdges; fill: currentColor; }
+.s-landing .dlbox svg { align-self: flex-end; width: 21px; height: 24px; shape-rendering: crispEdges; fill: currentColor; }
 .s-landing .dl:hover, .s-landing .dl:focus-visible { background: var(--bg); color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); outline: none; }
-.s-landing .dl:hover svg, .s-landing .dl:focus-visible svg { animation: landing-nudge .6s steps(2) infinite; }
+.s-landing .dl:hover svg, .s-landing .dl:focus-visible svg,
+.s-landing .dl-letter:hover svg, .s-landing .dl-letter:focus-visible svg { animation: landing-nudge .6s steps(2) infinite; }
 @keyframes landing-nudge { 50% { transform: translateY(2px); } }
 /* small square (phones): short label */
-.s-landing .dl.compact .dl-t { display: none; }
-.s-landing .dl.compact .dl-short { display: block; }
-.s-landing .dl.compact .dl-s { font-size: 10px; }
-.s-landing .dl.compact svg { width: 14px; height: 16px; }
+.s-landing .dlbox.compact .dl .dl-t { display: none; }
+.s-landing .dlbox.compact .dl .dl-short { display: block; }
+.s-landing .dlbox.compact .dl-s { font-size: 10px; }
+.s-landing .dlbox.compact svg { width: 14px; height: 16px; }
+
+/* the two halves, cut by one drawn pixel of bg */
+.s-landing .split { position: absolute; inset: 0; display: grid; grid-template-rows: 1fr 1fr; gap: var(--px, 2px); visibility: hidden; }
+.s-landing .dlbox.open .split { visibility: visible; }
+.s-landing .dlbox.open .dl { pointer-events: none; }
+.s-landing .dlbox.done .dl { display: none; }
+.s-landing .morph { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
+.s-landing .dl-half { position: relative; overflow: hidden; text-decoration: none; margin: 0; padding: 0; border: 0; font: inherit; text-align: left; cursor: pointer; background: none; }
+.s-landing .dl-face {
+  position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between;
+  padding: calc(var(--pad, 18px) * .6);
+}
+.s-landing .cv-on { background: var(--geo); color: var(--bg); }
+.s-landing .cv-off { background: var(--off); color: var(--text); visibility: hidden; cursor: not-allowed; }
+.s-landing .dlbox.grey .cv-off { visibility: visible; }
+.s-landing .dlbox.grey .dl-cv { cursor: not-allowed; }
+.s-landing .dl-cv:not([aria-disabled]):hover .cv-on, .s-landing .dl-cv:not([aria-disabled]):focus-visible .cv-on { background: var(--bg); color: var(--geo); box-shadow: inset 0 0 0 1px var(--geo); }
+.s-landing .dl-cv:focus-visible { outline: none; }
+.s-landing .dl-cv[aria-disabled]:focus-visible .cv-off { box-shadow: inset 0 0 0 1px var(--dim); }
+.s-landing .dl-letter .dl-face { background: var(--kmr); color: var(--bg); }
+.s-landing .dl-letter svg { position: absolute; right: calc(var(--pad, 18px) * .6); bottom: calc(var(--pad, 18px) * .6); width: 14px; height: 16px; }
+.s-landing .dl-letter:hover .dl-face, .s-landing .dl-letter:focus-visible .dl-face { background: var(--bg); color: var(--kmr); box-shadow: inset 0 0 0 1px var(--kmr); }
+.s-landing .dl-letter:focus-visible { outline: none; }
+/* halves too short for the full labels */
+.s-landing .dlbox.tight .dl-half .dl-t, .s-landing .dlbox.tight .dl-half .dl-s { display: none; }
+.s-landing .dlbox.tight .dl-half .dl-short { display: block; }
 
 /* portrait: the hero is one screen, held in place (sticky) with the CV header in its "1" square;
    the CV body is a sheet under it that slides up over it, a dithered top edge (--edge, built by section.js) */

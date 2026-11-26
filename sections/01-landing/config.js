@@ -22,6 +22,20 @@ export default {
     filename: 'Lettre_recommandation_Dr_Kamilo_Melo.pdf',
   },
 
+  // KM-RoBoTa recommendation letter, bottom half of the split download square; the one matching the site language
+  kmrLetter: {
+    en: { pdf: 'assets/kmr-recommendation-letter-en.pdf', filename: 'KM-RoBoTa_recommendation_letter.pdf' },
+    fr: { pdf: 'assets/kmr-recommendation-letter-fr.pdf', filename: 'KM-RoBoTa_lettre_de_recommandation.pdf' },
+  },
+
+  // the download square, once clicked: it dithers into two halves (CV on top, letter below); the CV half, once
+  // clicked, dithers to grey, "currently unavailable"
+  // both run the photo transition (TRANS_MS above), shorter
+  SPLIT: {
+    ms: 400,            // the square splitting into the two halves
+    greyMs: 400,        // the CV half turning grey
+  },
+
   P: 2,                 // CSS px per drawn pixel, for both canvases (and the transition)
   INTRO_MS: 7000,       // spiral + CV writing
   HOLD_MS: 4200,        // time each photo rests
@@ -50,7 +64,9 @@ export default {
     ink: '#ebe7de',
     text: '#a8a39a',
     dim: '#5e5a53',
-    geo: '#a3b6cf',     // construction lines, used at low alpha
+    geo: '#b9a7d9',     // pastel purple: construction lines (low alpha), headings, arrows, the CV half of the download square
+    kmr: '#ffd800',     // KM-RoBoTa yellow (same as the kmr section), the letter half of the download square
+    off: '#3b3935',     // the CV half once unavailable
   },
 
   // entry transition: Bayer 8x8 dissolve of the frozen screen into bg, on the same 2 px grid

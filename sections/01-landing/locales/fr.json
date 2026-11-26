@@ -83,7 +83,15 @@
     "title": "Télécharger le CV",
     "short": "CV",
     "sub": "PDF, format suisse",
-    "label": "Télécharger le CV, PDF au format suisse"
+    "label": "Télécharger le CV ou la lettre de recommandation",
+    "cv": "Télécharger le CV",
+    "cvOff": "Actuellement indisponible",
+    "cvOffShort": "Indispo.",
+    "letter": "Lettre de recommandation",
+    "letterShort": "Lettre",
+    "letterSub": "KM-RoBoTa SA, PDF",
+    "letterLabel": "Télécharger la lettre de recommandation de KM-RoBoTa, PDF",
+    "cvOffLabel": "CV, actuellement indisponible"
   },
   "replay": "Rejouer"
 }

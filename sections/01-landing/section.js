@@ -1,5 +1,5 @@
 // Golden-rectangle hero: the spiral construction drawn on a pixel grid, the CV typewritten into the
-// first square, the photo carousel (ordered-dither transitions) in the .618 square, the PDF in the .236 one.
+// first square, the photo carousel (ordered-dither transitions) in the .618 square, the downloads in the .236 one.
 import t from './content.js';
 import config from './config.js';
 import { BAYER, pack, rgb } from '../../core/dither.js';
@@ -67,6 +67,13 @@ const dlText = c => `<span class="dl-t">${c.download.title}</span>
       <span class="dl-short">${c.download.short}</span>
       <span class="dl-s">${c.download.sub}</span>`;
 
+const ARROW = `<svg viewBox="0 0 7 8" aria-hidden="true"><rect x="3" y="0" width="1" height="5"/><rect x="1" y="3" width="1" height="1"/><rect x="5" y="3" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="4" y="4" width="1" height="1"/><rect x="0" y="7" width="7" height="1"/></svg>`;
+// the two halves of the download square, once split
+const cvOnText = c => `<span class="dl-t">${c.download.cv}</span><span class="dl-short">${c.download.short}</span>`;
+const cvOffText = c => `<span class="dl-t">${c.download.cvOff}</span><span class="dl-short">${c.download.cvOffShort}</span>`;
+const letterText = c => `<span class="dl-t">${c.download.letter}</span><span class="dl-short">${c.download.letterShort}</span>
+      <span class="dl-s">${c.download.letterSub}</span>`;
+
 const markup = c => `
 <div class="hero">
   <canvas class="geo" aria-hidden="true"></canvas>
@@ -79,10 +86,21 @@ const markup = c => `
     <header>${head(c)}</header>
     <div class="cols">${body(c)}</div>
   </article>
-  <a class="dl" href="${asset(config.cv.pdf)}" download="${config.cv.filename}" aria-label="${c.download.label}">
-    <span class="dl-top">${dlText(c)}</span>
-    <svg viewBox="0 0 7 8" aria-hidden="true"><rect x="3" y="0" width="1" height="5"/><rect x="1" y="3" width="1" height="1"/><rect x="5" y="3" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="4" y="4" width="1" height="1"/><rect x="0" y="7" width="7" height="1"/></svg>
-  </a>
+  <div class="dlbox">
+    <button type="button" class="dl" aria-label="${c.download.label}">
+      <span class="dl-top">${dlText(c)}</span>
+      ${ARROW}
+    </button>
+    <div class="split">
+      <button type="button" class="dl-half dl-cv" aria-label="${c.download.cv}">
+        <span class="dl-face cv-on"><span class="dl-txt">${cvOnText(c)}</span></span>
+        <span class="dl-face cv-off"><span class="dl-txt">${cvOffText(c)}</span></span>
+      </button>
+      <a class="dl-half dl-letter" aria-label="${c.download.letterLabel}">
+        <span class="dl-face"><span class="dl-txt">${letterText(c)}</span>${ARROW}</span>
+      </a>
+    </div>
+  </div>
 </div>`;
 
 export async function mount(root, env) {
@@ -102,7 +120,9 @@ export async function mount(root, env) {
   const pcv = root.querySelector('.photo'), pctx = pcv.getContext('2d');
   const cv = root.querySelector('.cv');
   const countEl = root.querySelector('.caption');
-  const dl = root.querySelector('.dl');
+  const dlBox = root.querySelector('.dlbox'), dl = dlBox.querySelector('.dl'), split = dlBox.querySelector('.split');
+  const cvBtn = split.querySelector('.dl-cv'), cvOff = split.querySelector('.cv-off'), letterA = split.querySelector('.dl-letter');
+  const [cvOnTxt, cvOffTxt, letterTxt] = split.querySelectorAll('.dl-txt');
   const cols = root.querySelector('.cols');
   const header = cv.querySelector('header'), dlTop = root.querySelector('.dl-top');
 
@@ -213,11 +233,12 @@ export async function mount(root, env) {
     Object.assign(cv.style, { left: cvBox[0] + 'px', top: cvBox[1] + 'px', width: cvBox[2] + 'px', height: cvBox[3] ? cvBox[3] + 'px' : 'auto',
       padding: Math.round(cvBox[2] * 0.07) + 'px' });
 
-    // download button: fills the .236 square
+    // download square: fills the .236 square (its halves get half of it each)
     const [bx, by, bs] = steps[3].sq;
-    Object.assign(dl.style, { left: bx + 'px', top: by + 'px', width: bs + 'px', height: bs + 'px' });
-    dl.classList.toggle('compact', bs < 150);
-    dl.style.padding = Math.round(Math.max(9, bs * 0.09)) + 'px';
+    Object.assign(dlBox.style, { left: bx + 'px', top: by + 'px', width: bs + 'px', height: bs + 'px' });
+    dlBox.classList.toggle('compact', bs < 150);
+    dlBox.classList.toggle('tight', bs < 230);   // the halves: short labels only
+    dlBox.style.setProperty('--pad', Math.round(Math.max(9, bs * 0.09)) + 'px');
 
     fitCV();
 
@@ -611,14 +632,151 @@ export async function mount(root, env) {
     },
   });
 
+  // ---------- download square: splits into two halves, CV on top, KM-RoBoTa letter below ----------
+  // Clicked, the CV half turns grey: currently unavailable. Both changes run the photo transition (photo.render):
+  // the element is drawn before and after the change (backgrounds, inset borders, text, the pixel arrow), and a
+  // canvas laid over it goes colour -> 1 bit, A -> B with glitched rows, 1 bit -> colour, the blocks swelling
+  // to 5 drawn pixels mid-way. The DOM already holds the new state under it, so the canvas just goes at the end.
+  const rgba = v => (v.match(/[\d.]+/g) || []).map(Number).concat(1).slice(0, 4);
+  function snapshot(target) {
+    const dpr = Math.max(1, Math.round(devicePixelRatio || 1));
+    const box = target.getBoundingClientRect();
+    const W = Math.round(box.width * dpr), H = Math.round(box.height * dpr);
+    if (!W || !H) return null;
+    const c = document.createElement('canvas'); c.width = W; c.height = H;
+    const g = c.getContext('2d', { willReadFrequently: true });
+    g.scale(dpr, dpr); g.translate(-box.left, -box.top);
+    const range = document.createRange();
+    (function walk(el, alpha) {
+      const st = getComputedStyle(el);
+      if (st.display === 'none') return;
+      alpha *= +st.opacity;
+      const r = el.getBoundingClientRect(), shown = st.visibility === 'visible';
+      g.globalAlpha = alpha;
+      if (shown && rgba(st.backgroundColor)[3] > 0) { g.fillStyle = st.backgroundColor; g.fillRect(r.left, r.top, r.width, r.height); }
+      if (shown && st.boxShadow.includes('inset')) {           // the hover outline: inset 0 0 0 <spread> <colour>
+        const col = st.boxShadow.match(/rgba?\([^)]*\)/)?.[0];
+        const spread = parseFloat(st.boxShadow.replace(/rgba?\([^)]*\)/, '').match(/-?[\d.]+px/g)?.[3]) || 0;
+        if (col && spread) { g.strokeStyle = col; g.lineWidth = spread; g.strokeRect(r.left + spread / 2, r.top + spread / 2, r.width - spread, r.height - spread); }
+      }
+      if (el instanceof SVGSVGElement) {                        // the pixel arrow: its rects, in viewBox units
+        if (!shown) return;
+        const vb = el.viewBox.baseVal, sx = r.width / vb.width, sy = r.height / vb.height;
+        g.fillStyle = st.color;
+        for (const q of el.querySelectorAll('rect'))
+          g.fillRect(r.left + q.x.baseVal.value * sx, r.top + q.y.baseVal.value * sy, q.width.baseVal.value * sx, q.height.baseVal.value * sy);
+        return;
+      }
+      for (const n of el.childNodes) {
+        if (n.nodeType === 1) { walk(n, alpha); g.globalAlpha = alpha; continue; }
+        if (n.nodeType !== 3 || !shown) continue;
+        g.font = `${st.fontStyle} ${st.fontWeight} ${st.fontSize} ${st.fontFamily}`;
+        g.letterSpacing = st.letterSpacing === 'normal' ? '0px' : st.letterSpacing;
+        g.fillStyle = st.color; g.textBaseline = 'alphabetic';
+        for (const m of n.textContent.matchAll(/\S+/g)) {     // word by word, where the browser laid it out
+          range.setStart(n, m.index); range.setEnd(n, m.index + m[0].length);
+          const rr = range.getClientRects()[0]; if (!rr) continue;
+          const word = st.textTransform === 'uppercase' ? m[0].toUpperCase() : m[0];
+          g.fillText(word, rr.left, rr.top + g.measureText(word).fontBoundingBoxAscent);
+        }
+      }
+    })(target, 1);
+    const px = g.getImageData(0, 0, W, H).data, n = W * H;
+    const col = new Uint32Array(px.buffer.slice(0)), lum = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
+      const o = i * 4;
+      // -1: see-through. Squeezed into .2 .. .7: the faces are flat, and a face near the 1 bit colours themselves
+      // (the white button IS paper, hovered it is ink) would dither into itself and the transition would not show
+      lum[i] = px[o + 3] < 128 ? -1 : 0.2 + 0.5 * (0.2126 * px[o] + 0.7152 * px[o + 1] + 0.0722 * px[o + 2]) / 255;
+    }
+    return { W, H, dpr, col, lum };
+  }
+  // When each cell turns 1 bit. The photos take it from the Bayer matrix again (transposed, shifted), but that order
+  // is tied to the Bayer thresholds: the first half of the cells to switch all have thresholds under a light flat
+  // face, so a button stayed blank until mid-way. A fixed shuffle instead, picked so the switched cells carry the
+  // face's real share of ink at every stage (within 6 %, for the ink, grey, purple, yellow and white faces).
+  const MORPH_ORDER = Float32Array.from([1, 14, 59, 9, 54, 17, 39, 15, 38, 2, 51, 46, 24, 58, 36, 32, 63, 4, 19, 7, 37, 23, 6, 20,
+    27, 53, 28, 52, 22, 56, 55, 5, 12, 44, 13, 16, 61, 42, 26, 33, 11, 30, 25, 8, 29, 34, 49, 18, 50, 48, 41, 62, 45, 40, 31, 35,
+    60, 10, 3, 47, 43, 57, 0, 21], r => (r + 0.5) / 64);
+  function morph(target, change, ms) {
+    const A = REDUCED || !ms ? null : snapshot(target);
+    change();
+    const B = A && snapshot(target);
+    if (!A || !B || A.W !== B.W || A.H !== B.H) return Promise.resolve();
+    const IW = A.W, IH = A.H, cell = P * A.dpr;
+    const over = document.createElement('canvas');
+    over.className = 'morph'; over.setAttribute('aria-hidden', 'true'); over.width = IW; over.height = IH;
+    target.appendChild(over);
+    const octx = over.getContext('2d'), out = octx.createImageData(IW, IH), o32 = new Uint32Array(out.data.buffer);
+    const D = (S, i, td) => S.lum[i] < 0 ? 0 : S.lum[i] > td ? PAPER : INK;
+    return new Promise(done => {
+      const start = performance.now();
+      (function frame(now) {
+        const u = Math.min(1, (now - start) / ms);
+        const nb = 1 + Math.round(4 * Math.sin(Math.PI * u)), blk = nb * cell;
+        const phase = u < 0.4 ? 0 : u < 0.6 ? 1 : 2;
+        const k = phase === 0 ? u / 0.4 : phase === 1 ? (u - 0.4) / 0.2 : (u - 0.6) / 0.4;
+        const glitch = phase === 1 ? Math.sin(Math.PI * k) : 0;
+        for (let by = 0, ry = 0; ry < IH; by++, ry += blk) {
+          const shift = glitch ? Math.round((Math.random() - 0.5) * 2 * glitch * (Math.random() < 0.35 ? 6 : 0)) * blk : 0;
+          const sy = Math.min(IH - 1, ry + (blk >> 1)), yEnd = Math.min(IH, ry + blk);
+          for (let bx = 0, rx = 0; rx < IW; bx++, rx += blk) {
+            const sx = Math.min(IW - 1, Math.max(0, rx + (blk >> 1) + shift)), i = sy * IW + sx, xEnd = Math.min(IW, rx + blk);
+            const td = BAYER[((by & 7) << 3) | (bx & 7)];
+            const tm = MORPH_ORDER[((by & 7) << 3) | (bx & 7)];
+            let S = null, c = 0;                  // S: a colour cell of that snapshot, else c: a 1 bit cell
+            if (phase === 0) { if (tm < k) c = D(A, i, td); else S = A; }
+            else if (phase === 1) c = tm < k ? D(B, i, td) : D(A, i, td);
+            else if (tm < k) S = B; else c = D(B, i, td);
+            if (S && nb === 1) { for (let y = ry; y < yEnd; y++) o32.set(S.col.subarray(y * IW + rx, y * IW + xEnd), y * IW + rx); continue; }
+            if (S) c = S.col[i];                  // swollen blocks: one colour each, as the photos do
+            for (let y = ry; y < yEnd; y++) o32.fill(c, y * IW + rx, y * IW + xEnd);
+          }
+        }
+        octx.putImageData(out, 0, 0);
+        if (u < 1) requestAnimationFrame(frame); else { over.remove(); done(); }
+      })(start);
+    });
+  }
+  const cvLabel = c => cvBtn.setAttribute('aria-label', dlBox.classList.contains('grey') ? c.download.cvOffLabel : c.download.cv);
+
+  // the letter in the site language, again on a language switch
+  function setLetter() {
+    const l = config.kmrLetter[document.documentElement.lang] || config.kmrLetter.en;
+    letterA.href = asset(l.pdf); letterA.download = l.filename;
+  }
+  setLetter();
+
+  let morphing = false;
+  dl.addEventListener('click', async () => {
+    if (morphing || dlBox.classList.contains('open')) return;
+    morphing = true;
+    const hadFocus = document.activeElement === dl;
+    await morph(dlBox, () => {
+      dlBox.classList.add('open', 'done');
+      if (hadFocus) cvBtn.focus({ preventScroll: true });
+    }, config.SPLIT.ms);
+    morphing = false;
+  });
+  cvBtn.addEventListener('click', async () => {
+    if (morphing || dlBox.classList.contains('grey')) return;
+    morphing = true;
+    await morph(cvBtn, () => {
+      dlBox.classList.add('grey');
+      cvBtn.setAttribute('aria-disabled', 'true');
+      cvLabel(texts());
+    }, config.SPLIT.greyMs);
+    morphing = false;
+  });
+
   let saver = null;
   window.claude?.use?.('downloads').then(ns => { saver = ns; }).catch(() => {});
-  dl.addEventListener('click', async e => {
+  letterA.addEventListener('click', async e => {
     if (!saver) return;                      // normal link on ovsiankina.com
     e.preventDefault();
     try {
-      const blob = await (await fetch(dl.getAttribute('href'))).blob();
-      await saver.save({ filename: dl.getAttribute('download'), data: blob });
+      const blob = await (await fetch(letterA.href)).blob();
+      await saver.save({ filename: letterA.download, data: blob });
     } catch (err) { /* declined or unavailable: nothing to do */ }
   });
 
@@ -656,7 +814,7 @@ export async function mount(root, env) {
       ready.then(() => { held = false; startIntro(); resume(); });
     },
     onLeave() { pause(); },
-    words: () => [header, cols, dlTop, replayEl],
+    words: () => [header, cols, dlTop, cvOnTxt, cvOffTxt, letterTxt, replayEl],
     relang() {
       const part = N ? shown / N : 1;            // as much of the new text written as there was of the old
       const c = texts();
@@ -664,6 +822,10 @@ export async function mount(root, env) {
       frameEl.setAttribute('aria-label', c.photoLabel);
       dl.setAttribute('aria-label', c.download.label);
       dlTop.innerHTML = dlText(c);
+      cvOnTxt.innerHTML = cvOnText(c); cvOffTxt.innerHTML = cvOffText(c); letterTxt.innerHTML = letterText(c);
+      cvLabel(c);
+      letterA.setAttribute('aria-label', c.download.letterLabel);
+      setLetter();
       replayEl.textContent = t('replay');
       header.innerHTML = head(c);
       cols.innerHTML = body(c);
