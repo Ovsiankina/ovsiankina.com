@@ -11,6 +11,7 @@ python3 -m http.server 8000   # then open http://localhost:8000/
 - `index.html`, `core/`: the shell. Stacks the sections in one scrolling page, plays transitions, admin shell.
 - `core/vendor/i18next.js`: i18next 26.5.12, its ES module build copied unchanged from npm (no build step, no CDN).
 - `sections/sections.js`: the section order.
+- `mostoslavsky/`: the separate one-page site of mostoslavsky.com (see below), not part of this page.
 - `sections/NN-name/`: one folder per section.
   - `locales/en.json`, `locales/fr.json`: the text, in English and French
   - `content.js`: loads them as the section's i18next namespace (named after its `id`) and exports its `t`
@@ -38,24 +39,10 @@ The maths section shows one of two figures, picked with the switch under it (sav
 
 Press `~` anywhere. `help` lists the commands. `ls` lists the sections with their numbers. `cd 3` or `cd math` plays the transition into that section from wherever you are. `lang fr` switches the language. `skip on` / `skip off` sets skipping the transitions. `intro` plays the mostoslavsky.com intro. `#s3` in the address bar opens on section 3, through its transition.
 
+## mostoslavsky.com
+
+`mostoslavsky.com` (the misspelling search engines autocorrect to) is its own small site, so it shows up for the "y" spelling: `mostoslavsky/` is its whole web root, served by Caddy on its own. It is deployed alone (`git archive HEAD mostoslavsky | tar -x --strip-components=1` into its web root), so nothing in it may point outside the folder: it carries its own copy of what it uses from the landing (the construction, the photo dither, two photos). One screen: the landing cut down, the name spelled with a y ("also written Mostoslavski"), a short CV, and in the download square a "see the full CV" link to `https://mostoslavski.com/?from=mostoslavsky`, which plays the intro below. Its own title, description, `robots.txt` and `sitemap.xml`; its canonical is itself, never mostoslavski.com, or search engines would fold it into the main site. The main page's footer links back to it.
+
 ## mostoslavsky.com intro
 
-`core/intro.js`. `mostoslavsky.com` (the misspelling) redirects to `https://mostoslavski.com/?from=mostoslavsky`. With that query the page opens on black: "mostoslavsky" dithers in, its y travels cell by cell into an i, the name dithers out, then the black dissolves away and uncovers the landing, whose own intro starts then. The page loads underneath meanwhile; an inline guard at the top of `index.html`'s `<head>` keeps it hidden until the canvas covers it. The query is removed on start, so a reload doesn't replay it. Click, tap, wheel or any key ends it. It plays only from that query (typing it by hand works too) or `intro` in the shell, never under reduced motion.
-
-The redirect, on the same server (nginx):
-
-```nginx
-server {
-    listen 80;  listen [::]:80;
-    server_name mostoslavsky.com www.mostoslavsky.com;
-    return 302 https://mostoslavski.com/?from=mostoslavsky;
-}
-server {
-    listen 443 ssl;  listen [::]:443 ssl;  http2 on;
-    server_name mostoslavsky.com www.mostoslavsky.com;
-    # ssl_certificate / ssl_certificate_key: mostoslavsky.com needs its own (certbot), or https:// fails before redirecting
-    return 302 https://mostoslavski.com/?from=mostoslavsky;
-}
-```
-
-302 while testing, 301 once final (browsers cache a 301 hard).
+`core/intro.js`. With `?from=mostoslavsky` (the "see the full CV" link of mostoslavsky.com) the page opens on black: "mostoslavsky" dithers in, its y travels cell by cell into an i, the name dithers out, then the black dissolves away and uncovers the landing, whose own intro starts then. The page loads underneath meanwhile; an inline guard at the top of `index.html`'s `<head>` keeps it hidden until the canvas covers it. The query is removed on start, so a reload doesn't replay it. Click, tap, wheel or any key ends it. It plays only from that query (typing it by hand works too) or `intro` in the shell, never under reduced motion.
