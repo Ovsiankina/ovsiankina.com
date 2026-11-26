@@ -1,6 +1,6 @@
 // KM-RoBoTa: three sub-sections stacked in one root.
 //   1 · KM-RoBoTa  ASCII snake swims right to left into the text
-//   2 · AI Summit  STAR (robotic plesiosaur) swims left to right, bobbing, with ripples
+//   2 · AI Summit  the robotic plesiosaur swims left to right, bobbing, with ripples
 //   3 · Firmware   XIAO ESP32-C3 model, ASCII colour layers or pixel render, drag to turn
 // Text: content.js (locales/*.json). Knobs: config.js. The transition into it: transition.js.
 import t from './content.js';

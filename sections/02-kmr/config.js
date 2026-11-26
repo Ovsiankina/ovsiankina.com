@@ -9,7 +9,7 @@ export default {
     '--text': '#a6a6a6',
     '--dim': '#5c5c5c',
     '--line': '#262626',
-    '--yellow': '#f2c12e',
+    '--yellow': '#ffd800',   // KM-RoBoTa yellow
     // XIAO model ASCII layers (kept from the model study)
     '--a-mask': '#6e7380',
     '--a-edge': '#8c6b4b',
@@ -50,7 +50,7 @@ export default {
   snake: {
     sprite: { src: 'assets/snake.png', fw: 235, fh: 102, cols: 6, n: 43, fps: 30, speed: 72.91 },
     dir: -1, seed: 0,
-    ripple: { tips: 'assets/snake-ripple-tips.json',   // tail tip; much quieter than STAR's
+    ripple: { tips: 'assets/snake-ripple-tips.json',   // tail tip; much quieter than the plesiosaur's
               minSpeed: 3, maxSpeed: 14, refSpeed: 6, cooldown: 0.7, life: 1.4, maxR: 24, strength: 0.6, squash: 0.75 },
     fit: ({ W, H, end, mobile }) => {
       if (!mobile) return { k: Math.min(0.52 * W / 224, 0.55 * H / 102), cy: H * 0.54 };
@@ -59,7 +59,7 @@ export default {
     },
   },
 
-  // 2 · STAR (cut out of the booth clip, turned to swim left -> right)
+  // 2 · the plesiosaur (cut out of the booth clip, turned to swim left -> right)
   // fin strokes are exaggerated in the frames: each blade is bent around its shoulder, 2 to 3.2x the filmed angle
   star: {
     sprite: { src: 'assets/star.png', fw: 265, fh: 153, cols: 10, n: 60, fps: 30, speed: 56 },

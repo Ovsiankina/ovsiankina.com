@@ -7,7 +7,7 @@
     ],
     "title": "De la robotique temps réel, écrite en Rust.",
     "paragraphs": [
-      "Apprenti développeur chez KM-RoBoTa, une entreprise de robotique à Renens, en parallèle de mon CFC d'informaticien en développement d'applications. J'en suis aussi le <em>seul développeur logiciel</em> : chaque logiciel qui tourne sur nos robots est le mien.",
+      "Apprenti développeur chez KM-RoBoTa, une entreprise de robotique à Renens, en parallèle de mon CFC d'informaticien en développement d'applications. J'en suis aussi le <em>seul développeur logiciel</em> : j'ai conçu chaque logiciel qui tourne sur nos robots.",
       "Mon travail principal est <em>kmr</em>, un SDK Rust pour le contrôle de robots en temps réel : boucles de contrôle no-std sans allocation, builders en type-state qui refusent les configurations de robot invalides dès la compilation, et <em>dxl-rs</em>, un pilote Dynamixel configuré par des tables de contrôle RON. Ce travail a mené à ma première publication IEEE évaluée par les pairs (2026)."
     ],
     "stack": [
@@ -24,7 +24,7 @@
     ],
     "title": "Un stand. Tous les robots. Un seul développeur.",
     "paragraphs": [
-      "J'ai tenu le stand de KM-RoBoTa à l'AI Summit, à Palexpo, Genève. Chaque robot exposé tournait sur du logiciel que j'ai écrit, y compris notre robot phare, <em>STAR</em>, un plésiosaure robotique.",
+      "J'ai tenu le stand de KM-RoBoTa à l'AI Summit, à Palexpo, Genève. Chaque robot exposé tournait sur du logiciel que j'ai écrit, y compris notre robot phare, un <em>plésiosaure robotique</em>.",
       "J'ai présenté l'entreprise aux visiteurs et, côté logiciel des robots, j'étais toute l'équipe à la fois : <em>sysadmin</em> pour garder les machines en marche, <em>opérateur</em> pour piloter les robots en direct, et <em>vendeur</em> pour expliquer ce qu'ils savaient faire."
     ],
     "stack": [
@@ -38,17 +38,16 @@
     "label": [
       "Firmware",
       "XIAO",
-      "no-std",
-      "RTIC"
+      "no-std"
     ],
     "title": "De la batterie à chaque actionneur.",
     "paragraphs": [
-      "Au plus près du matériel : sur des microcontrôleurs Seeed <em>XIAO</em>, j'ai écrit le firmware qui gère la façon dont la batterie du robot alimente ses capteurs et ses actionneurs, en <em>Rust no-std</em> sur le framework <em>RTIC</em>.",
-      "Rien de tel n'existait en Rust, alors tout est écrit de zéro, de l'accès bare-metal au matériel jusqu'aux tâches RTIC qui pilotent la distribution d'énergie."
+      "Au plus près du matériel : sur des microcontrôleurs Seeed <em>XIAO</em>, j'ai écrit le firmware qui gère la façon dont la batterie du robot alimente ses capteurs et ses actionneurs, en <em>Rust no-std</em>.",
+      "Par-dessus le support Rust existant de la carte, j'ai construit la <em>couche de confort</em> : ses capteurs (microphone, gyroscope et accéléromètre) s'utilisent facilement via <em>USB</em>, <em>UART</em> et <em>Bluetooth</em>."
     ],
     "stack": [
       "no-std",
-      "RTIC",
+      "USB, UART, Bluetooth",
       "XIAO ESP32-C3",
       "Distribution d'énergie"
     ],
