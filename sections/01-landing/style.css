@@ -6,7 +6,7 @@
   --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --pixel: "Silkscreen", "IBM Plex Mono", ui-monospace, monospace;
   --fs: 13px;
-  --replay-fg: var(--dim); --replay-hover: var(--ink);   /* core's shared replay button (core/replay.js) */
+  --replay-fg: var(--ink); --replay-on: var(--bg);   /* core's shared replay button (core/replay.js) */
   color-scheme: dark;
   background: var(--bg); color: var(--text); font-family: var(--mono);
   padding-bottom: var(--bottom-gap, 0px);

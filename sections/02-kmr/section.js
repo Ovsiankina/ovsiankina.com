@@ -8,6 +8,7 @@ import config from './config.js';
 import { swimmer } from './swimmer.js';
 import { xiao } from './xiao.js';
 import { sh } from '../../core/viewport.js';
+import { replayButton } from '../../core/replay.js';
 
 export const id = 'kmr';
 export const title = 'KM-RoBoTa';
@@ -80,14 +81,18 @@ export async function mount(root, env) {
   const board = xiao(root.querySelector('.xiao'), root, config.xiao, block('xiao'))
     .then(x => { parts.push(x); return x; });
 
+  // bottom right of the first sub-section, the one on screen after the transition: plays that transition again
+  const replayEl = replayButton(root.querySelector('.ax-kmr'), t('replay'), () => env.nav.goTo(env.index));
+
   const inst = {
     ready: Promise.all([kmr.ready, summit.ready, board]),
     // the transition parks KM-RoBoTa's own snake while its robot swims: never two snakes at once
     hold(on) { kmr.hold(on); },
     onEnter() { parts.forEach(p => p.resume()); },
     onLeave() { parts.forEach(p => p.pause()); },
-    words: () => [...root.querySelectorAll('.copy, .ctrl')],
+    words: () => [...root.querySelectorAll('.copy, .ctrl'), replayEl],
     relang() {
+      replayEl.textContent = t('replay');
       for (const [sel, key] of Object.entries(BLOCKS)) {
         const sub = root.querySelector(sel), c = block(key);
         sub.setAttribute('aria-label', plain(c.title));

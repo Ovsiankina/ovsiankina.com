@@ -7,8 +7,9 @@
   --mono:  "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --pixel: "Silkscreen", "IBM Plex Mono", ui-monospace, monospace;
   color-scheme: dark;
-  --replay-fg: var(--dim);     /* core's shared replay button (core/replay.js) */
-  --replay-hover: var(--ink);
+  --replay-fg: var(--ink);     /* core's shared replay button (core/replay.js) */
+  --replay-line: var(--line);
+  --replay-on: var(--bg);
 }
 
 /* ---------- maths section ---------- */

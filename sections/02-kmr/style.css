@@ -2,6 +2,7 @@
 .s-kmr {
   --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   color-scheme: dark;
+  --replay-fg: var(--ink); --replay-line: #3a3a3a; --replay-on: var(--black);   /* core's shared replay button (core/replay.js) */
 }
 .s-kmr.dragging { user-select: none; -webkit-user-select: none; cursor: grabbing; }
 

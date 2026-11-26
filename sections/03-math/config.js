@@ -12,6 +12,7 @@ export default {
     'paper-ink': '#0d0c09',
     'yellow':    '#FFE45C',    // trace colour far from the origin...
     'teal':      '#2EE6D6',    // ...and close to it (OKLab mix in between)
+    'line':      '#3a3833',    // frame of the switches
   },
 
   pixel: 2,                    // CSS px per drawn pixel (same as the landing)

@@ -6,6 +6,7 @@
 //   xiao     3 · Firmware (XIAO model, ASCII or plain render). viewer: modesLabel names the ASCII / Render switch
 //            for screen readers. silkscreen: printed in white on the underside of the 3D board.
 //   each: label (first item highlighted in yellow), title, paragraphs, stack
+//   replay   bottom right of the first sub-section: plays the transition into the section again
 import { translations } from '../../core/lang.js';
 import en from './locales/en.json' with { type: 'json' };
 import fr from './locales/fr.json' with { type: 'json' };

@@ -1,7 +1,7 @@
 .s-climbing {
   /* --climb-paper, --climb-ink and --climb-tail are set from config by section.js */
-  --replay-fg: #7A6F88;              /* the shared replay button (core/replay.js), on the cream wall */
-  --replay-hover: var(--climb-ink);
+  --replay-fg: var(--climb-ink);     /* the shared replay button (core/replay.js), on the cream wall */
+  --replay-line: #7A6F88; --replay-bg: var(--climb-paper); --replay-on: var(--climb-paper);
   overflow: hidden;
   background: var(--climb-paper);
 }

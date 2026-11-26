@@ -7,8 +7,8 @@
   --line: rgba(233, 238, 252, 0.18);
   --cream: #fff9c2;
   --cyan: #2efff2;
-  --replay-fg: var(--dim);   /* core's shared replay button (core/replay.js) */
-  --replay-hover: var(--ink);
+  --replay-fg: var(--ink);   /* core's shared replay button (core/replay.js) */
+  --replay-line: var(--line); --replay-bg: var(--panel); --replay-on: var(--night);
   --pixel: 'Silkscreen', 'IBM Plex Mono', ui-monospace, monospace;
   --mono: 'JetBrains Mono', ui-monospace, monospace;
   color-scheme: dark;
