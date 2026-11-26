@@ -79,6 +79,8 @@ export default {
 
   // ---------- the midnight swirl page (from sections/balanki.html) ----------
   swirl: {
+    bleed: 10,         // % of a screen the swirl reaches past the section's top and bottom, under the dithered joins
+                       // (so a 120 % tall swirl); the joins beside it are that tall and see-through on its side
     intro: 7,          // s, the swirl blooming out of the night; starts once the eye has shut
     still: 20,         // s, the frame shown under prefers-reduced-motion
     dprMax: 2,

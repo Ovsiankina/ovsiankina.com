@@ -5,6 +5,9 @@
 //                                       also its name in the ~ shell (ls, cd <id>): one short lowercase word, unique
 //                  export const title   human-readable name
 //                  export const edges   { top, bottom } CSS colours at its top and bottom edges, for the dithered joins
+//                  export const bleed   optional, % of a screen height: its background reaches that far past its
+//                                       top and bottom, under the joins beside it (root gets --bleed, use it in
+//                                       style.css). Those joins are that tall and see-through on its side
 //                  export const leadIn  optional block placed just above the section, owned by it: the approach
 //                                       { edges, dwell?, mount(el, env) -> instance } dwell: ms to wait at its end
 //                                       before the transition (el gets class "s-<id>-leadin", style it in style.css)
@@ -59,6 +62,7 @@ const loaded = await Promise.all(list.map(async (dir, i) => {
       loadStyle(new URL('style.css', base)),
     ]);
     root.classList.add(`s-${mod.id}`);
+    if (mod.bleed) root.style.setProperty('--bleed', `calc(${mod.bleed} * var(--sh))`);
     let lead = null;
     if (mod.leadIn) {
       lead = document.createElement('div');
@@ -78,7 +82,7 @@ sections.forEach((s, i) => { s.index = i + 1; s.root.dataset.index = i + 1; });
 // the page top to bottom: lead-ins and sections, then the seams joining them
 const flow = sections.flatMap(s => [
   ...(s.lead ? [{ el: s.lead, edges: s.mod.leadIn.edges }] : []),
-  { el: s.root, edges: s.mod.edges },
+  { el: s.root, edges: s.mod.edges, bleed: s.mod.bleed || 0 },
 ]);
 let seams = null;
 const commands = {};

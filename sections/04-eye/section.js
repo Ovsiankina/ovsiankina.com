@@ -14,6 +14,7 @@ import { replayButton } from '../../core/replay.js';
 export const id = 'eye';
 export const title = 'Eye';
 export const edges = { top: config.colors.night, bottom: config.colors.night };
+export const bleed = config.swirl.bleed;   // the swirl runs on under the joins above and below
 
 const clamp01 = x => Math.min(1, Math.max(0, x));
 const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };

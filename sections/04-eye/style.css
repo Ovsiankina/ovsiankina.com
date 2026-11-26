@@ -12,10 +12,17 @@
   --pixel: 'Silkscreen', 'IBM Plex Mono', ui-monospace, monospace;
   --mono: 'JetBrains Mono', ui-monospace, monospace;
   color-scheme: dark;
-  height: calc(100 * var(--sh)); overflow: hidden;
+  height: calc(100 * var(--sh));
+  isolation: isolate;   /* its own layer: the joins above and below (z-index 1) stay on top of the swirl's bleed */
   background: var(--night); color: var(--ink);
 }
-.s-eye .swirl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: pointer; }
+/* the swirl reaches var(--bleed) (set by core from `bleed` in section.js) past the top and bottom, under the
+   dithered joins, which are see-through on its side: the dither waves cross over the swirl. Resting on the
+   section, the screen shows only its middle 100 % */
+.s-eye .swirl {
+  position: absolute; left: 0; right: 0; top: calc(-1 * var(--bleed, 0px));
+  width: 100%; height: calc(100% + 2 * var(--bleed, 0px)); display: block; cursor: pointer;
+}
 
 /* the work-in-progress tag, centred on the swirl, between two strips of construction tape */
 .s-eye .wip {

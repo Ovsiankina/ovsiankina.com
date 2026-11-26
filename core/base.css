@@ -13,6 +13,7 @@ html.locked { overflow: hidden; overscroll-behavior: none; }
 
 /* the dithered joins between blocks (core/seam.js) */
 #site > .seam { display: block; position: relative; pointer-events: none; image-rendering: pixelated; }
+#site > .seam.bleed { z-index: 1; }   /* over the background a bleeding section runs on underneath it */
 
 /* the replay button every section uses (core/replay.js); place it inside a positioned box */
 .replay-btn {

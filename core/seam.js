@@ -5,6 +5,9 @@
 // A join is its own strip in the page flow, between the two blocks: a section resting at the top of the
 // screen never shows one, they only appear while scrolling. The walk-down transition fires before its strip
 // comes into view (core/navigator.js), so on the way down the frozen screen ends clean.
+// A section with a bleed (core/site.js) runs its background on under the joins beside it: those joins are
+// bleed % of a screen tall, to match, and see-through on its side, so the waves cross over its background.
+import { screenH } from './viewport.js';
 
 const SEAM = {
   height: 144,      // CSS px, the strip between the two blocks
@@ -35,21 +38,27 @@ export function createSeams(site, blocks) {
     if (!up || !down) continue;
     const a = rgb(up), b = rgb(down);
     if (Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]) + Math.abs(a[2] - b[2]) < SEAM.same) continue;
+    const bleedUp = blocks[i - 1].bleed || 0, bleedDown = blocks[i].bleed || 0, bleed = Math.max(bleedUp, bleedDown);
     const cv = document.createElement('canvas');
-    cv.className = 'seam';
+    cv.className = bleed ? 'seam bleed' : 'seam';
     cv.setAttribute('aria-hidden', 'true');
     blocks[i].el.before(cv);
-    seams.push({ cv, ctx: cv.getContext('2d'), A: pack(a), B: pack(b), visible: false, img: null });
+    seams.push({
+      cv, ctx: cv.getContext('2d'), visible: false, img: null, bleed,
+      A: bleedUp ? 0 : pack(a), B: bleedDown ? 0 : pack(b),   // 0: transparent, the bleeding background shows
+    });
   }
 
   function place() {
     for (const s of seams) {
-      const w = Math.ceil(site.clientWidth / SEAM.pix), h = Math.ceil(SEAM.height / SEAM.pix);
+      const tall = s.bleed ? screenH() * s.bleed / 100 : SEAM.height;
+      const w = Math.ceil(site.clientWidth / SEAM.pix), h = Math.ceil(tall / SEAM.pix);
       if (s.cv.width !== w || s.cv.height !== h) {
         s.cv.width = w; s.cv.height = h;
         s.img = s.ctx.createImageData(w, h); s.out = new Uint32Array(s.img.data.buffer);
       }
-      Object.assign(s.cv.style, { width: w * SEAM.pix + 'px', height: SEAM.height + 'px' });
+      // a bleeding join is sized with the very expression the section's bleed uses, so the two never part
+      Object.assign(s.cv.style, { width: w * SEAM.pix + 'px', height: s.bleed ? `calc(${s.bleed} * var(--sh))` : tall + 'px' });
       draw(s, performance.now());
     }
   }
