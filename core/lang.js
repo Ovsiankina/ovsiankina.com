@@ -1,7 +1,8 @@
-// Site language, 'en' or 'fr'.
+// Site language, 'en' or 'fr', through i18next (vendor/i18next.js). Every section's words are an i18next namespace.
 // On load: the choice saved by the switch (top centre), else the first of the browser's preferred languages that is
 // English or French, else English. Switching rewrites the words in place: every section's text dithers out at once,
 // each section puts in the new words (instance.relang), and they dither back in. No reload, nothing replays.
+import i18next from './vendor/i18next.js';
 import { dissolve } from './dither.js';
 
 export const LANGS = ['en', 'fr'];
@@ -17,13 +18,24 @@ function detect() {
   return 'en';
 }
 
-export let lang = detect();
+// Synchronous (initAsync: false, resources inline): the sections read their words while their modules load.
+// fallbackLng: a key missing from fr.json is read from en.json, so words that are the same in both live in en.json only.
+// escapeValue: false, the words are ours and may hold a little HTML (<em>, <a>, <br>).
+i18next.init({
+  lng: detect(), fallbackLng: 'en', supportedLngs: LANGS, initAsync: false,
+  resources: {}, interpolation: { escapeValue: false },
+});
+
+export let lang = i18next.language;          // mirrors i18next, for the ~ shell
 document.documentElement.lang = lang;
 
-// content.js: export default pick({ en, fr }, shared). Every read goes to the language current at the time of
-// reading, so a section that reads its content again after a switch gets the new words. shared: the same in both.
-export const pick = (texts, shared = {}) =>
-  new Proxy(shared, { get: (s, k) => (k in s ? s[k] : (texts[lang] ?? texts.en)[k]) });
+// content.js: export default translations('<id>', { en, fr }), the section's locales/*.json. Returns i18next's t for that
+// namespace. It reads the language current at the time of the call, so a section that calls it again after a switch
+// gets the new words. Lists and blocks: t('left', { returnObjects: true }).
+export function translations(ns, bundles) {
+  for (const [l, res] of Object.entries(bundles)) i18next.addResourceBundle(l, ns, res);
+  return i18next.getFixedT(null, ns);
+}
 
 // The EN / FR switch, fixed top centre. It dithers away while a transition plays and comes back after it.
 // Returns swap(next): the language change, also used by the ~ shell. Resolves false when refused.
@@ -49,7 +61,8 @@ export function langSwitch(nav, sections) {
     mark(next);
     try {
       await dissolve(words(), 0, MS);
-      lang = next;
+      await i18next.changeLanguage(next);
+      lang = i18next.language;
       document.documentElement.lang = lang;
       try { localStorage.setItem(KEY, lang); } catch {}
       for (const s of sections) {

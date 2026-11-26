@@ -1,0 +1,22 @@
+{
+  "valueLabel": "ζ(½ + {{t}}i)",
+  "ariaLabel": "Mathematics",
+  "heading": "Mathematics",
+  "paragraphs": [
+    "Mathematics is my passion. Behind a real-time control loop or a Rust type system there is always a structure, and that structure is what draws me in.",
+    "My dream is not only to use it. One day I would like to <em>move a real open question forward</em>, even by a small step."
+  ],
+  "caption": "ζ(½ + it) ON THE CRITICAL LINE. EVERY PASS THROUGH THE ORIGIN IS A NON-TRIVIAL ZERO. THE RIEMANN HYPOTHESIS STATES THAT THEY ALL LIE THERE.",
+  "replay": "REPLAY",
+  "transitionCaption": "STANDARD MODEL LAGRANGIAN",
+  "tuning": {
+    "title": "TUNING (TEST)",
+    "vmax": "MAX SPEED",
+    "vmin": "MIN SPEED",
+    "radius": "BRAKING RADIUS",
+    "tau": "INERTIA",
+    "crad": "COLOUR RADIUS",
+    "restart": "RESTART",
+    "defaults": "DEFAULTS"
+  }
+}

@@ -9,9 +9,11 @@ python3 -m http.server 8000   # then open http://localhost:8000/
 ## Layout
 
 - `index.html`, `core/`: the shell. Stacks the sections in one scrolling page, plays transitions, admin shell.
+- `core/vendor/i18next.js`: i18next 26.5.12, its ES module build copied unchanged from npm (no build step, no CDN).
 - `sections/sections.js`: the section order.
 - `sections/NN-name/`: one folder per section.
-  - `content.js`: the text, in English and French: `pick({ en, fr })` from `core/lang.js`
+  - `locales/en.json`, `locales/fr.json`: the text, in English and French
+  - `content.js`: loads them as the section's i18next namespace (named after its `id`) and exports its `t`
   - `config.js`: timings, colours, asset paths
   - `assets/`: images, video, meshes
   - `section.js`, `transition.js`, `style.css`: the code
@@ -22,7 +24,9 @@ Each section owns the transition that leads **into** it. A transition never know
 
 ## Languages
 
-English and French. The language is picked once per page load (`core/lang.js`): the choice saved by the EN / FR switch (top centre), else the first of the browser's languages that is English or French, else English. Switching saves the choice and rewrites the words in place: every section's text dithers out at once, each section puts in the new words (`relang()`, see `core/site.js`), and they dither back in. The switch itself dithers away while a transition plays.
+English and French, through [i18next](https://www.i18next.com/). Each section's words are an i18next namespace: `t('heading')` for a string, `t('paragraphs', { returnObjects: true })` for a list or a block, `{{name}}` in a string for a value passed at the call, `$t(key)` to pull another key in. A key missing from `fr.json` is read from `en.json`, so words that are the same in both languages (names, the admin-shell lines) live in `en.json` only. Strings may hold a little HTML: i18next does not escape them.
+
+The language is picked once per page load (`core/lang.js`): the choice saved by the EN / FR switch (top centre), else the first of the browser's languages that is English or French, else English. Switching saves the choice and rewrites the words in place: every section's text dithers out at once, each section puts in the new words (`relang()`, see `core/site.js`), and they dither back in. The switch itself dithers away while a transition plays.
 
 ## Admin shell
 

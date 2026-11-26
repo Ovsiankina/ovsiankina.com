@@ -1,6 +1,6 @@
 // Golden-rectangle hero: the spiral construction drawn on a pixel grid, the CV typewritten into the
 // first square, the photo carousel (ordered-dither transitions) in the .618 square, the PDF in the .236 one.
-import content from './content.js';
+import t from './content.js';
 import config from './config.js';
 import { BAYER, pack, rgb } from '../../core/dither.js';
 import { replayButton } from '../../core/replay.js';
@@ -39,7 +39,15 @@ function bezier(x1, y1, x2, y2) {
   };
 }
 
-// ---------- markup, built from content.js ----------
+// ---------- markup, built from content.js (locales/*.json) ----------
+// the words of the page in the current language, read again on every call
+const links = { letterHref: asset(config.letter.pdf), letterFile: config.letter.filename };
+const tree = key => t(key, { returnObjects: true, ...links });
+const texts = () => ({
+  name: t('name'), role: t('role'), avail: t('avail'), left: tree('left'), right: tree('right'),
+  photoLabel: t('photoLabel'), download: tree('download'),
+});
+
 const block = b => `<section><h2>${b.heading}</h2>`
   + (b.job ? `<div class="job"><span>${b.job.company}</span><span class="when">${b.job.when}</span></div>` : '')
   + (b.text ? `<p>${b.text}</p>` : '')
@@ -82,8 +90,8 @@ export async function mount(root, env) {
 
   for (const [k, v] of Object.entries(config.palette)) root.style.setProperty('--' + k, v);
   root.style.setProperty('--bottom-gap', sh(config.BOTTOM_GAP * 100 + 'vh'));
-  root.setAttribute('aria-label', content.label);
-  root.innerHTML = markup(content);
+  root.setAttribute('aria-label', t('label'));
+  root.innerHTML = markup(texts());
 
   const hero = root.querySelector('.hero');
   const geo = root.querySelector('.geo'), gctx = geo.getContext('2d');
@@ -569,7 +577,7 @@ export async function mount(root, env) {
 
   frameEl.addEventListener('click', next);
   frameEl.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); next(); } });
-  const replayEl = replayButton(hero, content.replay, () => {
+  const replayEl = replayButton(hero, t('replay'), () => {
     if (held) return;                        // under an incoming transition (the frozen copy lets clicks through)
     cv.scrollTop = 0;
     held = false; startIntro(); resume();
@@ -589,16 +597,15 @@ export async function mount(root, env) {
   }, { passive: false });
 
   // ~ shell: "photo n" re-bakes the grain live, not saved (the value to keep goes into config.js)
-  const S = content.shell;
   env.command('photo', {
-    usage: S.usage, about: S.about,
+    usage: t('shell.usage'), about: t('shell.about'),
     run([arg, ...more], print) {
-      if (arg === undefined) { print(S.now(grainAmount)); return; }
+      if (arg === undefined) { print(t('shell.now', { n: grainAmount })); return; }
       const n = Number(arg);
-      if (more.length || arg.trim() === '' || !Number.isFinite(n) || n < 0 || n > 1000) { print(S.bad([arg, ...more].join(' ')), 'err'); return; }
+      if (more.length || arg.trim() === '' || !Number.isFinite(n) || n < 0 || n > 1000) { print(t('shell.bad', { arg: [arg, ...more].join(' ') }), 'err'); return; }
       grainAmount = n;
       if (photo.IW) photo.resize(photo.IW, photo.IH);
-      print(S.set(n), 'ok');
+      print(t('shell.set', { n }), 'ok');
     },
   });
 
@@ -650,13 +657,14 @@ export async function mount(root, env) {
     words: () => [header, cols, dlTop, replayEl],
     relang() {
       const part = N ? shown / N : 1;            // as much of the new text written as there was of the old
-      root.setAttribute('aria-label', content.label);
-      frameEl.setAttribute('aria-label', content.photoLabel);
-      dl.setAttribute('aria-label', content.download.label);
-      dlTop.innerHTML = dlText(content);
-      replayEl.textContent = content.replay;
-      header.innerHTML = head(content);
-      cols.innerHTML = body(content);
+      const c = texts();
+      root.setAttribute('aria-label', t('label'));
+      frameEl.setAttribute('aria-label', c.photoLabel);
+      dl.setAttribute('aria-label', c.download.label);
+      dlTop.innerHTML = dlText(c);
+      replayEl.textContent = t('replay');
+      header.innerHTML = head(c);
+      cols.innerHTML = body(c);
       scrambled = []; shown = 0;
       wrapCV();
       reveal(Math.round(part * N));

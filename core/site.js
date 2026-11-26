@@ -17,8 +17,8 @@
 //                                             onLeave()         another section is taking over: pause
 //                                             words()           the elements holding its text, dithered out and
 //                                                               back in around a language switch (core/lang.js)
-//                                             relang()          put the text in the new language; content.js
-//                                                               already reads in it
+//                                             relang()          put the text in the new language; content.js's t
+//                                                               (i18next) already reads in it
 //   transition.js  export async function play(t), resolves when the target is fully uncovered
 //                    t = { ghost, layer, root, section, index, from, via, reduced }
 //                    ghost: frozen copy of the screen as it was, fixed, above the live target (clip it, hide it)

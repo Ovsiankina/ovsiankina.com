@@ -2,8 +2,8 @@
 //   1 · KM-RoBoTa  ASCII snake swims right to left into the text
 //   2 · AI Summit  STAR (robotic plesiosaur) swims left to right, bobbing, with ripples
 //   3 · Firmware   XIAO ESP32-C3 model, ASCII colour layers or pixel render, drag to turn
-// Text: content.js. Knobs: config.js. The transition into it: transition.js.
-import content from './content.js';
+// Text: content.js (locales/*.json). Knobs: config.js. The transition into it: transition.js.
+import t from './content.js';
 import config from './config.js';
 import { swimmer } from './swimmer.js';
 import { xiao } from './xiao.js';
@@ -27,7 +27,8 @@ function copyText(c) {
     <div class="stack">${c.stack.join('<i>/</i>')}</div>`;
 }
 const copy = c => `<div class="copy">${copyText(c)}</div>`;
-// sub-section root -> its key in content.js
+// sub-section root -> its block in locales/*.json, read whole: block('kmr') is { label, title, paragraphs, stack }
+const block = key => t(key, { returnObjects: true });
 const BLOCKS = { '.ax-kmr': 'kmr', '.ax-summit': 'summit', '.xiao': 'xiao' };
 
 const swimmerBlock = (cls, side, c) => `
@@ -69,14 +70,14 @@ function xiaoBlock(c) {
 export async function mount(root, env) {
   for (const [k, v] of Object.entries(config.colors)) root.style.setProperty(k, v);
   root.style.setProperty('--section-h', sh(config.sectionHeight));
-  root.innerHTML = swimmerBlock('ax-kmr', 'left', content.kmr)
-                 + swimmerBlock('ax-summit', 'right', content.summit)
-                 + xiaoBlock(content.xiao);
+  root.innerHTML = swimmerBlock('ax-kmr', 'left', block('kmr'))
+                 + swimmerBlock('ax-summit', 'right', block('summit'))
+                 + xiaoBlock(block('xiao'));
 
   const kmr = swimmer(root.querySelector('.ax-kmr'), config.snake, config.swimmer);
   const summit = swimmer(root.querySelector('.ax-summit'), config.star, config.swimmer);
   const parts = [kmr, summit];
-  const board = xiao(root.querySelector('.xiao'), root, config.xiao, content.xiao)
+  const board = xiao(root.querySelector('.xiao'), root, config.xiao, block('xiao'))
     .then(x => { parts.push(x); return x; });
 
   const inst = {
@@ -88,11 +89,11 @@ export async function mount(root, env) {
     words: () => [...root.querySelectorAll('.copy, .ctrl')],
     relang() {
       for (const [sel, key] of Object.entries(BLOCKS)) {
-        const sub = root.querySelector(sel), c = content[key];
+        const sub = root.querySelector(sel), c = block(key);
         sub.setAttribute('aria-label', plain(c.title));
         sub.querySelector('.copy').innerHTML = copyText(c);   // the swimmers follow the new size on their own
       }
-      const v = content.xiao.viewer;
+      const v = block('xiao').viewer;
       root.querySelector('.xiao .stage').setAttribute('aria-label', v.ariaLabel);
       root.querySelector('.xiao .seg').setAttribute('aria-label', v.modesLabel);
       for (const b of root.querySelectorAll('.xiao .seg button')) b.textContent = v.modes[b.dataset.mode];

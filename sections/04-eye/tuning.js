@@ -1,10 +1,10 @@
 // Tuning panel, TEST ONLY: loaded by section.js only when config.swirl.tuningPanel is true, so it never ships otherwise.
 // The original's colour sliders (sections/balanki.html): cream, cyan and a third colour, pink or purple, edited live.
-import content from './content.js';
+import t from './content.js';
 import config from './config.js';
 
 export function mountTuning(root, swirl) {
-  const T = content.tuning, C = config.swirl;
+  const T = t('tuning', { returnObjects: true }), C = config.swirl;
   const link = document.createElement('link');
   link.rel = 'stylesheet'; link.href = new URL('./tuning.css', import.meta.url);
   document.head.appendChild(link);

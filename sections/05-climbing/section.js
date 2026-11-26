@@ -1,13 +1,13 @@
 // Bouldering: the cream climbing scene, last section of the site. The scene itself lives in scene.js,
 // the wipe that leads into it in transition.js, the dark glitching tail below it in tail.js.
-import content from './content.js';
+import t from './content.js';
 import config from './config.js';
 import { createScene } from './scene.js';
 import { createTail } from './tail.js';
 import { replayButton } from '../../core/replay.js';
 
 export const id = 'climbing';
-export const title = content.title;
+export const title = t('title');
 // cream at the top (the wall), the site's dark background at the end of the tail
 export const edges = { top: config.paper, bottom: config.tail.dark };
 
@@ -24,7 +24,7 @@ export async function mount(root, env) {
 </div>
 <div class="tail" aria-hidden="true"><canvas></canvas></div>`;
   const $ = s => root.querySelector(s);
-  $('.title').setAttribute('aria-label', content.titleLabel);
+  $('.title').setAttribute('aria-label', t('titleLabel'));
 
   const video = $('.video');
   video.muted = true;
@@ -38,7 +38,7 @@ export async function mount(root, env) {
 
   // the replay button is part of the scene (bottom right of it, not of the tail):
   // hidden while a transition uncovers the blank scene, faded in on arrival
-  const replay = replayButton(stage, content.replay, () => scene.replay());
+  const replay = replayButton(stage, t('replay'), () => scene.replay());
 
   // scrolled into without a transition (or back onto it): start or carry on; off screen: pause.
   // -1px: a scene merely touching the screen's edge (just left above or below) counts as off screen
@@ -51,8 +51,8 @@ export async function mount(root, env) {
     onLeave: () => scene.pause(),
     words: () => [replay],
     relang() {
-      replay.textContent = content.replay;
-      $('.title').setAttribute('aria-label', content.titleLabel);
+      replay.textContent = t('replay');
+      $('.title').setAttribute('aria-label', t('titleLabel'));
     },
   };
 }

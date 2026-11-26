@@ -4,7 +4,7 @@
 // Its lead-in is the end screen of the original: purple, the horizon glow growing as it scrolls in. Once the
 // transition has played it folds into a short purple break (no glow) for the rest of the visit: the rupture
 // is only ever seen in context, walking down into it or through the replay button.
-import c from './content.js';
+import t from './content.js';
 import config from './config.js';
 import { createGlow, rgb01 } from './glow.js';
 import { createSwirl } from './swirl.js';
@@ -75,9 +75,9 @@ const chevron = () => `<svg class="chev" viewBox="0 0 9 5" shape-rendering="cris
 export async function mount(root, env) {
   root.innerHTML = `
     <canvas class="swirl" aria-hidden="true"></canvas>
-    <p class="wip">${c.wip}</p>
-    <button class="next" type="button" aria-label="${c.nextLabel}">
-      <span class="next-label">${c.next}</span>
+    <p class="wip">${t('wip')}</p>
+    <button class="next" type="button" aria-label="${t('nextLabel')}">
+      <span class="next-label">${t('next')}</span>
       ${chevron()}${chevron()}${chevron()}
     </button>`;
   const canvas = root.querySelector('.swirl');
@@ -86,13 +86,13 @@ export async function mount(root, env) {
 
   const wip = root.querySelector('.wip'), next = root.querySelector('.next'), nextLabel = root.querySelector('.next-label');
   next.addEventListener('click', () => env.nav.goTo(env.index + 1));
-  const replayEl = replayButton(root, c.replay, () => env.nav.goTo(env.index));
+  const replayEl = replayButton(root, t('replay'), () => env.nav.goTo(env.index));
   const words = () => [wip, nextLabel, replayEl];
   function relang() {
-    wip.textContent = c.wip;
-    nextLabel.textContent = c.next;
-    next.setAttribute('aria-label', c.nextLabel);
-    replayEl.textContent = c.replay;
+    wip.textContent = t('wip');
+    nextLabel.textContent = t('next');
+    next.setAttribute('aria-label', t('nextLabel'));
+    replayEl.textContent = t('replay');
   }
   root.addEventListener('animationend', () => root.classList.remove('shake'));
   if (!swirl) return { words, relang };

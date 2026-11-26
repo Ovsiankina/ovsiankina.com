@@ -1,7 +1,7 @@
 // Maths section: copy column + zeta(1/2 + it) traced on the landing's 2 px pixel grid with 8x8 Bayer dithering.
 // The trace runs while the section is on screen and loops: it slows down at each non-trivial zero, dissolves at the end
 // and starts over.
-import content from './content.js';
+import t from './content.js';
 import config from './config.js';
 import { zeta } from './zeta.js';
 import { BAYER, pack, cssRgb } from './pixels.js';
@@ -10,7 +10,7 @@ import { replayButton } from '../../core/replay.js';
 import { screenH, onScreen } from '../../core/viewport.js';
 
 export const id = 'math';
-export const title = content.heading;
+export const title = t('heading');
 export const edges = { top: config.palette.bg, bottom: config.palette.bg };
 // the approach just above the section: black, with only sparse dots of the Lagrangian's paper on its last rows
 export const leadIn = { edges: { top: config.leadIn.black, bottom: config.palette.paper }, dwell: config.leadIn.dwell, mount: mountLeadIn };
@@ -51,9 +51,9 @@ for (let i = 1; i < COUNT - 1; i++) if (MAG[i] < 0.03 && MAG[i] <= MAG[i - 1] &&
 
 // the inside of .copy, rewritten on a language switch
 const copyText = () => `
-    <h2>${content.heading}</h2>
-    ${content.paragraphs.map(p => `<p>${p}</p>`).join('\n    ')}
-    <div class="cap">${content.caption}</div>`;
+    <h2>${t('heading')}</h2>
+    ${t('paragraphs', { returnObjects: true }).map(p => `<p>${p}</p>`).join('\n    ')}
+    <div class="cap">${t('caption')}</div>`;
 
 function markup() {
   return `
@@ -66,11 +66,11 @@ function markup() {
 
 export async function mount(root, env) {
   const REDUCED = env.reduced;
-  root.setAttribute('aria-label', content.ariaLabel);
+  root.setAttribute('aria-label', t('ariaLabel'));
   for (const [k, v] of Object.entries(config.palette)) root.style.setProperty('--' + k, v);
   root.innerHTML = markup();
   // replays the Lagrangian transition into this section, which itself starts the trace over underneath
-  const replayEl = replayButton(root, content.replay, () => env.nav.goTo(env.index));
+  const replayEl = replayButton(root, t('replay'), () => env.nav.goTo(env.index));
 
   const C_BG = cssRgb(root, '--bg'), C_INK = cssRgb(root, '--ink'), C_GEO = cssRgb(root, '--geo');
   const C_Y = cssRgb(root, '--yellow'), C_T = cssRgb(root, '--teal');
@@ -165,7 +165,7 @@ export async function mount(root, env) {
     return (S.vmin + (S.vmax - S.vmin) * f) * (REDUCED ? TR.reducedSpeed : 1);
   }
 
-  const valueText = tt => content.valueLabel.replace('{t}', tt.toFixed(2));
+  const valueText = tt => t('valueLabel', { t: tt.toFixed(2) });
 
   function zReset() { Z.t = 0; Z.v = 0; Z.fade = 0; zClear(); }
 
@@ -311,9 +311,9 @@ export async function mount(root, env) {
     onLeave() { paused = true; io.unobserve(root); io.observe(root); },   // re-observe: resumes if still on screen afterwards
     words: () => [copyEl, replayEl],
     relang() {
-      root.setAttribute('aria-label', content.ariaLabel);
+      root.setAttribute('aria-label', t('ariaLabel'));
       copyEl.innerHTML = copyText();
-      replayEl.textContent = content.replay;
+      replayEl.textContent = t('replay');
       zLayout(); zRender();                        // the portrait layout depends on the copy's height
     },
   };

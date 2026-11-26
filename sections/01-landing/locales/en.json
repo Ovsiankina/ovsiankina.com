@@ -1,0 +1,97 @@
+{
+  "publication": "<em>Static and Dynamic Dispatch in Robotics Control Loops: A Practical Performance Study in Rust.</em> IEEE, 2026",
+  "ieee": "<a href=\"https://ieeexplore.ieee.org/document/11533996\" target=\"_blank\" rel=\"noopener\">ieeexplore 11533996</a>",
+  "name": "David Mostoslavski",
+  "shell": {
+    "usage": "photo [n]",
+    "about": "photo dither, 0 to 1000 (100 = the first grain, no n: show it)",
+    "now": "photo: {{n}}",
+    "set": "photo: {{n}} (not saved: copy it into config.js PHOTO_DITHER to keep it)",
+    "bad": "photo: expected a number from 0 to 1000, got \"{{arg}}\""
+  },
+  "label": "CV",
+  "role": "Apprentice and lead software architect, embedded and real-time",
+  "avail": "Looking for a host company from October 2026 until my CFC (Swiss federal VET diploma) in July 2027.",
+  "left": [
+    {
+      "heading": "Profile",
+      "text": "Embedded and real-time software development, specialised in robotics. Lead author of an IEEE paper (2026) on static dispatch and its impact on real-time architecture. At the company Monday to Thursday, at school on Fridays."
+    },
+    {
+      "heading": "Experience",
+      "job": {
+        "company": "KM-RoBoTa SA, Renens",
+        "when": "04.2025 – now"
+      },
+      "items": [
+        "HAL and firmware in no-std Rust (ARM Cortex-M4), no RTOS: scheduling and drivers written from scratch.",
+        "Port of PREEMPT_RT to Arch Linux ARM64: kernel patches, configuration and build scripts.",
+        "Full control of a teleoperated robot: Bluetooth and Zenoh, power through an nRF52840, inverse kinematics.",
+        "CAN, RS485, TTL, Bluetooth; Rust wrapper of the Dynamixel SDK, FFI interface callable from C.",
+        "Port of research code (master's, PhD) from C++ to Rust, Dioxus interface for Linux and WASM.",
+        "I/O benchmarks and pure static dispatch, allocation-free architectures for the IEEE paper.",
+        "Local inference and internal agentic workflows; KM-RoBoTa at the AI for Good Global Summit."
+      ]
+    },
+    {
+      "heading": "Publication",
+      "text": "$t(publication), lead author. $t(ieee)"
+    },
+    {
+      "heading": "Education",
+      "text": "<em>CFC in IT, application development</em> (Swiss federal VET diploma)<br>EPSIC, Lausanne. 2023 – 2027, final year."
+    }
+  ],
+  "right": [
+    {
+      "heading": "Skills",
+      "list": [
+        [
+          "Languages",
+          "Rust, C, C++, Python, shell"
+        ],
+        [
+          "Embedded, real-time",
+          "no-std, bare-metal, ARM Cortex-M, CAN, RS485, TTL, Bluetooth, FFI, PREEMPT_RT"
+        ],
+        [
+          "Systems",
+          "Linux, build, CI/CD, cross-platform"
+        ],
+        [
+          "AI",
+          "local inference, fine-tuning, edge AI, agents"
+        ]
+      ]
+    },
+    {
+      "heading": "Languages",
+      "list": [
+        [
+          "French",
+          "native"
+        ],
+        [
+          "English",
+          "C1"
+        ],
+        [
+          "German",
+          "A2"
+        ]
+      ]
+    },
+    {
+      "heading": "Reference",
+      "text": "Dr Kamilo Melo, CEO, KM-RoBoTa SA. <a href=\"{{letterHref}}\" download=\"{{letterFile}}\">Letter of recommendation</a> available (in French)."
+    }
+  ],
+  "photoLabel": "Photos of David, click for the next one",
+  "download": {
+    "title": "Download the CV",
+    "short": "CV",
+    "sub": "PDF, Swiss format",
+    "label": "Download the CV, PDF in Swiss format"
+  },
+  "replay": "Replay"
+}

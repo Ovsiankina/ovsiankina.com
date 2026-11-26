@@ -1,0 +1,21 @@
+{
+  "ariaLabel": "Mathématiques",
+  "heading": "Mathématiques",
+  "paragraphs": [
+    "Les mathématiques sont ma passion. Derrière une boucle de contrôle temps réel ou un système de types en Rust, il y a toujours une structure, et c'est elle qui m'attire.",
+    "Mon rêve est de ne pas seulement les utiliser. J'aimerais un jour <em>faire avancer une vraie question ouverte</em>, même d'un petit pas."
+  ],
+  "caption": "ζ(½ + it) SUR LA DROITE CRITIQUE. CHAQUE PASSAGE PAR L'ORIGINE EST UN ZÉRO NON TRIVIAL. L'HYPOTHÈSE DE RIEMANN AFFIRME QU'ILS Y SONT TOUS.",
+  "replay": "REJOUER",
+  "transitionCaption": "LAGRANGIEN DU MODÈLE STANDARD",
+  "tuning": {
+    "title": "RÉGLAGES (TEST)",
+    "vmax": "VITESSE MAX",
+    "vmin": "VITESSE MIN",
+    "radius": "RAYON FREINAGE",
+    "tau": "INERTIE",
+    "crad": "RAYON COULEUR",
+    "restart": "RELANCER",
+    "defaults": "DÉFAUTS"
+  }
+}

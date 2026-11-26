@@ -1,0 +1,87 @@
+{
+  "label": "CV",
+  "role": "Apprenti et lead architecte logiciel, embarqué et temps réel",
+  "avail": "Recherche une entreprise d'accueil dès octobre 2026, jusqu'au CFC en juillet 2027.",
+  "left": [
+    {
+      "heading": "Profil",
+      "text": "Développement de logiciels embarqués et temps réel, spécialisé en robotique. Auteur principal d'une publication IEEE (2026) sur le dispatch statique et ses impacts sur l'architecture temps réel. En entreprise du lundi au jeudi, école le vendredi."
+    },
+    {
+      "heading": "Expérience",
+      "job": {
+        "company": "KM-RoBoTa SA, Renens",
+        "when": "04.2025 – auj."
+      },
+      "items": [
+        "HAL et firmware en Rust no-std (ARM Cortex-M4), sans RTOS : ordonnancement et pilotes écrits de zéro.",
+        "Portage de PREEMPT_RT sur Arch Linux ARM64 : patchs noyau, configuration et scripts de build.",
+        "Contrôle complet d'un robot téléopéré : Bluetooth et Zenoh, alimentation via nRF52840, cinématique inverse.",
+        "CAN, RS485, TTL, Bluetooth ; wrapper Rust du SDK Dynamixel, interface FFI appelable depuis C.",
+        "Portage de recherche (master, doctorat) du C++ vers Rust, interface Dioxus pour Linux et WASM.",
+        "Benchmarks I/O et architectures en dispatch statique pur, sans allocation, pour la publication IEEE.",
+        "Inférence locale et workflows agentiques internes ; KM-RoBoTa au AI for Good Global Summit."
+      ]
+    },
+    {
+      "heading": "Publication",
+      "text": "$t(publication), auteur principal. $t(ieee)"
+    },
+    {
+      "heading": "Formation",
+      "text": "<em>CFC informaticien, développement d'applications</em><br>EPSIC, Lausanne. 2023 – 2027, dernière année."
+    }
+  ],
+  "right": [
+    {
+      "heading": "Compétences",
+      "list": [
+        [
+          "Langages",
+          "Rust, C, C++, Python, shell"
+        ],
+        [
+          "Embarqué, temps réel",
+          "no-std, bare-metal, ARM Cortex-M, CAN, RS485, TTL, Bluetooth, FFI, PREEMPT_RT"
+        ],
+        [
+          "Systèmes",
+          "Linux, build, CI/CD, multiplateforme"
+        ],
+        [
+          "IA",
+          "inférence locale, fine-tuning, edge AI, agents"
+        ]
+      ]
+    },
+    {
+      "heading": "Langues",
+      "list": [
+        [
+          "Français",
+          "langue maternelle"
+        ],
+        [
+          "Anglais",
+          "C1"
+        ],
+        [
+          "Allemand",
+          "A2"
+        ]
+      ]
+    },
+    {
+      "heading": "Référence",
+      "text": "Dr Kamilo Melo, CEO, KM-RoBoTa SA. <a href=\"{{letterHref}}\" download=\"{{letterFile}}\">Lettre de recommandation</a> disponible."
+    }
+  ],
+  "photoLabel": "Photos de David, cliquer pour passer à la suivante",
+  "download": {
+    "title": "Télécharger le CV",
+    "short": "CV",
+    "sub": "PDF, format suisse",
+    "label": "Télécharger le CV, PDF au format suisse"
+  },
+  "replay": "Rejouer"
+}

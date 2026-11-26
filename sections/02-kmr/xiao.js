@@ -2,7 +2,7 @@
 import { fontIn, fontLate } from './swimmer.js';
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// root: the .xiao sub-section. sectionRoot: gets .dragging while a drag is on. cfg: config.xiao. text: content.xiao
+// root: the .xiao sub-section. sectionRoot: gets .dragging while a drag is on. cfg: config.xiao. text: the xiao block of locales/*.json
 export async function xiao(root, sectionRoot, cfg, text) {
   const stage = root.querySelector('.stage');
   const cv = stage.querySelector('canvas.px'), ctx = cv.getContext('2d');

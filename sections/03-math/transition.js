@@ -9,7 +9,7 @@
 // The ghost sits above the section, so wherever C can appear it is clipped away: bands erase top to bottom, and a
 // band's write pen has fully crossed it (seam and wobble included) before its erase pen starts, so the ghost is never
 // needed above the bottom of the lowest band being erased.
-import content from './content.js';
+import tr from './content.js';   // i18next t, renamed: play(t) is the transition
 import config from './config.js';
 import { BAYER, pack, clamp01, cssRgb } from './pixels.js';
 
@@ -189,7 +189,7 @@ export async function play(t) {
   box.innerHTML = '<canvas></canvas><div class="cap"></div>';
   layer.appendChild(box);
   const cap = box.querySelector('.cap');
-  cap.textContent = content.transitionCaption;
+  cap.textContent = tr('transitionCaption');
   const canvas = box.querySelector('canvas');
   const T = {
     box, canvas, ctx: canvas.getContext('2d'), ghost, cap, cut: -1,

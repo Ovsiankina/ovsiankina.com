@@ -1,0 +1,13 @@
+{
+  "tuning": {
+    "cream": "CREAM",
+    "cyan": "CYAN",
+    "purple": "PURPLE",
+    "pink": "PINK",
+    "third": "Third color"
+  },
+  "wip": "Work in progress",
+  "next": "Continue",
+  "nextLabel": "Continue to climbing",
+  "replay": "Replay"
+}
