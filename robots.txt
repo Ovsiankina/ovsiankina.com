@@ -1,0 +1,6 @@
+User-agent: *
+# effect drafts and loose PDFs (CV, letters of recommendation) stay out of search results
+Disallow: /effects/
+Disallow: /*.pdf$
+
+Sitemap: https://mostoslavski.com/sitemap.xml
