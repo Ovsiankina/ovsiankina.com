@@ -15,12 +15,14 @@ const PHI = (1 + Math.sqrt(5)) / 2;
 const STEP_100 = 255 / 11;
 // "more below" chevron, in drawn pixels
 const CHEV = [
-  'x.......x',
-  'xx.....xx',
-  '.xx...xx.',
-  '..xx.xx..',
-  '...xxx...',
-  '....x....',
+  'xx.........xx',
+  'xxx.......xxx',
+  '.xxx.....xxx.',
+  '..xxx...xxx..',
+  '...xxx.xxx...',
+  '....xxxxx....',
+  '.....xxx.....',
+  '......x......',
 ];   // photo dither step at amount 100: 12 levels per channel, the first grain
 const asset = p => new URL(p, import.meta.url).href;
 
@@ -352,7 +354,7 @@ export async function mount(root, env) {
   // ---------- "more below" arrows ----------
   // Three chevrons on the pixel grid, levitating in a slow wave. The bob is sub-pixel: each arrow's alpha is
   // split between the two rows it sits across, then ordered-dithered, so it drifts instead of jumping a row.
-  const MORE_GAP = 5, MORE_W = 3 * CHEV[0].length + 2 * MORE_GAP, MORE_H = CHEV.length + 3;
+  const MORE_GAP = 8, MORE_W = 3 * CHEV[0].length + 2 * MORE_GAP, MORE_H = CHEV.length + 3;
   let moreAt = null;   // when the arrows started fading in (after the intro), null: hidden
   const moreA = new Float32Array(MORE_W * MORE_H);
   function drawMore(now) {
