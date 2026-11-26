@@ -1,11 +1,11 @@
 {
   "label": "CV",
-  "role": "Apprenti et lead architecte logiciel, embarqué et temps réel",
-  "avail": "Recherche une entreprise d'accueil dès octobre 2026, jusqu'au CFC en juillet 2027.",
+  "role": "Seul architecte logiciel et ingénieur principal, embarqué et temps réel",
+  "avail": "Actuellement chez KM-RoBoTa, avec l'objectif de poursuivre mes études à l'ETH Zurich.",
   "left": [
     {
       "heading": "Profil",
-      "text": "Développement de logiciels embarqués et temps réel, spécialisé en robotique. Auteur principal d'une publication IEEE (2026) sur le dispatch statique et ses impacts sur l'architecture temps réel. En entreprise du lundi au jeudi, école le vendredi."
+      "text": "Développement de logiciels embarqués et temps réel, spécialisé en robotique. Auteur principal d'une publication IEEE (2026) sur le dispatch statique et ses impacts sur l'architecture temps réel."
     },
     {
       "heading": "Expérience",
@@ -14,11 +14,13 @@
         "when": "04.2025 – auj."
       },
       "items": [
+        "<em>kmr_v3</em>, l'architecture du SDK de contrôle temps réel des robots de KM-RoBoTa : conçue et développée seul, en tant qu'unique architecte logiciel et ingénieur principal.",
         "HAL et firmware en Rust no-std (ARM Cortex-M4), sans RTOS : ordonnancement et pilotes écrits de zéro.",
-        "Portage de PREEMPT_RT sur Arch Linux ARM64 : patchs noyau, configuration et scripts de build.",
+        "PREEMPT_RT sur Arch Linux ARM64 : un paquet Arch Linux dédié, que j'ai créé et que je maintiens (patchs noyau, configuration, scripts de build). Bientôt disponible publiquement sur un serveur de fichiers, puis sur l'AUR.",
         "Contrôle complet d'un robot téléopéré : Bluetooth et Zenoh, alimentation via nRF52840, cinématique inverse.",
-        "CAN, RS485, TTL, Bluetooth ; wrapper Rust du SDK Dynamixel, interface FFI appelable depuis C.",
-        "Portage de recherche (master, doctorat) du C++ vers Rust, interface Dioxus pour Linux et WASM.",
+        "CAN, RS485, TTL, Bluetooth ; réécriture complète du SDK Dynamixel en Rust : meilleur suivi des erreurs et sécurité accrue, interface FFI appelable depuis C, et compatibilité avec toutes les tables de contrôle, que j'ai extraites du web à la main tant elles sont hétérogènes.",
+        "Portage de code de recherche (master, doctorat) du C++ vers Rust, mathématiques portées sur mon propre design kmr_v3 ; interface Dioxus pour Linux et WASM.",
+        "<em>typographus</em>, un wrapper de logs pour Rust : un système de logs plus pratique, personnalisable et optimisé.",
         "Benchmarks I/O et architectures en dispatch statique pur, sans allocation, pour la publication IEEE.",
         "Inférence locale et workflows agentiques internes ; KM-RoBoTa au AI for Good Global Summit."
       ]
