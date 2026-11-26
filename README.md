@@ -28,7 +28,7 @@ English and French, through [i18next](https://www.i18next.com/). Each section's 
 
 The language is picked once per page load (`core/lang.js`): the choice saved by the EN / FR switch (top centre), else the first of the browser's languages that is English or French, else English. Switching saves the choice and rewrites the words in place: every section's text dithers out at once, each section puts in the new words (`relang()`, see `core/site.js`), and they dither back in. The switch itself dithers away while a transition plays.
 
-At the right end of the same line, "skip transitions" (`core/skip.js`), for visitors who have already seen the animations: while it is on, every transition plays its short reduced-motion cut and no lead-in dwells. The choice is saved.
+At the right end of the same line, "skip transitions" (`core/skip.js`), for visitors who have already seen the animations: while it is on, every transition plays its short reduced-motion cut and no lead-in dwells. Opt-in only: every visit starts with it off, the choice is never saved.
 
 ## Maths figure
 
@@ -40,7 +40,7 @@ Press `~` anywhere. `help` lists the commands. `ls` lists the sections with thei
 
 ## mostoslavsky.com intro
 
-`core/intro.js`. `mostoslavsky.com` (the misspelling) redirects to `https://mostoslavski.com/?from=mostoslavsky`. With that query the page opens on black: "mostoslavsky" dithers in, its y travels cell by cell into an i, the name dithers out, then the black dissolves away and uncovers the landing, whose own intro starts then. The page loads underneath meanwhile; an inline guard at the top of `index.html`'s `<head>` keeps it hidden until the canvas covers it. The query is removed on start, so a reload doesn't replay it. Click, tap, wheel or any key ends it. It plays only from that query (typing it by hand works too) or `intro` in the shell, never under reduced motion, and not from the query while "skip transitions" is on.
+`core/intro.js`. `mostoslavsky.com` (the misspelling) redirects to `https://mostoslavski.com/?from=mostoslavsky`. With that query the page opens on black: "mostoslavsky" dithers in, its y travels cell by cell into an i, the name dithers out, then the black dissolves away and uncovers the landing, whose own intro starts then. The page loads underneath meanwhile; an inline guard at the top of `index.html`'s `<head>` keeps it hidden until the canvas covers it. The query is removed on start, so a reload doesn't replay it. Click, tap, wheel or any key ends it. It plays only from that query (typing it by hand works too) or `intro` in the shell, never under reduced motion.
 
 The redirect, on the same server (nginx):
 

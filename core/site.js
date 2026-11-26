@@ -34,14 +34,14 @@ import { createNavigator } from './navigator.js';
 import { createShell } from './shell.js';
 import { createSeams } from './seam.js';
 import { lang, LANGS, langSwitch } from './lang.js';
-import { skipSwitch, skipSaved } from './skip.js';
+import { skipSwitch } from './skip.js';
 import { playIntro, introRequested, stripIntroParam } from './intro.js';
 
 const site = document.getElementById('site');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 // arriving through the mostoslavsky.com redirect (?from=mostoslavsky): its intro plays at once, over the page
-// loading underneath. Not for reduced motion, not with "skip transitions" on (index.html's guard agrees)
-const intro = introRequested() && !reduced && !skipSaved() ? playIntro() : (stripIntroParam(), null);
+// loading underneath. Not for reduced motion (index.html's guard agrees)
+const intro = introRequested() && !reduced ? playIntro() : (stripIntroParam(), null);
 history.scrollRestoration = 'manual';
 scrollTo(0, 0);
 

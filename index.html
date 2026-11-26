@@ -8,9 +8,7 @@
   // the mostoslavsky.com intro (core/intro.js) is coming: keep the page hidden until its canvas covers it.
   // Same conditions as core/site.js. The timeout is a safety net: the page never stays hidden if the script fails.
   (function () {
-    var skip = false;
-    try { skip = localStorage.getItem('skip') === '1'; } catch (e) {}
-    if (new URLSearchParams(location.search).get('from') === 'mostoslavsky' && !skip &&
+    if (new URLSearchParams(location.search).get('from') === 'mostoslavsky' &&
         !matchMedia('(prefers-reduced-motion: reduce)').matches) {
       var html = document.documentElement;
       html.classList.add('intro-pending');

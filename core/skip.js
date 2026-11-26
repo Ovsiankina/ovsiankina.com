@@ -1,17 +1,12 @@
 // "Skip transitions", top right of the screen, on the line of the EN / FR switch, for visitors who have already seen the
-// animations. Off: dark, like the unselected language. On: lit, like the selected one. The choice is saved.
+// animations. Off: dark, like the unselected language. On: lit, like the selected one. Opt-in only: every visit
+// starts with it off, the choice is never saved.
 // While on, the navigator plays every transition as its short reduced-motion cut and no lead-in dwells.
 // Returns set(on), also used by the ~ shell.
 import { dissolve } from './dither.js';
 import { lang, MS, localized } from './lang.js';
 
-const KEY = 'skip';
 const WORDS = { en: ['Skip transitions', 'Skip'], fr: ['Passer les transitions', 'Passer'] };   // [wide, phones]
-
-// the saved choice, also read by index.html's <head> guard (same key) for the mostoslavsky.com intro
-export function skipSaved() {
-  try { return localStorage.getItem(KEY) === '1'; } catch { return false; }
-}
 
 export function skipSwitch(nav, bar) {
   const el = document.createElement('div');
@@ -29,11 +24,8 @@ export function skipSwitch(nav, bar) {
   const set = on => {
     nav.skip = on;
     b.setAttribute('aria-pressed', nav.skip);
-    try { localStorage.setItem(KEY, nav.skip ? '1' : '0'); } catch {}
   };
-  const saved = skipSaved();
-  nav.skip = saved;
-  b.setAttribute('aria-pressed', saved);
+  set(false);
   bar.appendChild(el);
 
   nav.watch(busy => { el.inert = busy; dissolve([el], busy ? 0 : 1, MS); });
